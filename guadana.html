@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preoperacional - Guadañadora / Desbrozadora</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e8449 0%, #145a32 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .app-container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        .header-app {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+        .header-app h1 { font-size: 26px; margin-bottom: 5px; }
+        .header-app p { opacity: 0.9; font-size: 14px; }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .form-header {
+            background: #1e8449;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .form-header h2 { font-size: 22px; }
+
+        .form-body { padding: 30px; }
+
+        .section-title {
+            color: #1e8449;
+            font-size: 17px;
+            font-weight: 700;
+            margin: 25px 0 15px 0;
+            padding: 10px 15px;
+            background: #e9f7ef;
+            border-left: 5px solid #27ae60;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 20px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .field-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .field-group input, .field-group select {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .field-group input:focus, .field-group select:focus {
+            border-color: #27ae60;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin: 10px 0 20px 0;
+        }
+        th {
+            background: #27ae60;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        th:first-child { text-align: left; width: 50%; }
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e8e8e8;
+            text-align: center;
+        }
+        td:first-child { text-align: left; font-weight: 500; color: #2c3e50; padding-left: 12px; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr.subheader td {
+            background: #d5f5e3;
+            font-weight: 700;
+            color: #1e8449;
+            text-align: left;
+            padding-left: 12px;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .radio-option {
+            position: relative;
+            cursor: pointer;
+        }
+        .radio-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0; height: 0;
+        }
+        .radio-option .check-btn {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            line-height: 32px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.2s;
+            color: #888;
+        }
+        .radio-option input:checked + .check-btn.bueno {
+            background: #27ae60; border-color: #27ae60; color: white;
+        }
+        .radio-option input:checked + .check-btn.malo {
+            background: #e74c3c; border-color: #e74c3c; color: white;
+        }
+
+        .obs-input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 12px;
+            outline: none;
+        }
+        .obs-input:focus { border-color: #27ae60; }
+
+        .resumen-box {
+            background: #e9f7ef;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .resumen-item {
+            text-align: center;
+        }
+        .resumen-item .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #27ae60;
+        }
+        .resumen-item .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .epp-section {
+            background: #fff9e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #f1c40f;
+        }
+        .epp-section h3 {
+            color: #7d6608;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .epp-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #444;
+        }
+        .epp-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #27ae60;
+            cursor: pointer;
+        }
+
+        .notas-seguridad {
+            background: #fdf2e9;
+            border-left: 5px solid #e67e22;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .notas-seguridad h3 {
+            color: #7e5109;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .notas-seguridad ol {
+            padding-left: 20px;
+            color: #7e5109;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .resultado-box {
+            background: #eaf2f8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .resultado-box h3 {
+            color: #1a5276;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .resultado-opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .resultado-opciones label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .resultado-opciones label:hover {
+            border-color: #2980b9;
+        }
+        .resultado-opciones input {
+            width: 20px;
+            height: 20px;
+            accent-color: #27ae60;
+        }
+        .resultado-opciones input:checked + span {
+            font-weight: 700;
+        }
+        .resultado-opciones label.apto {
+            background: #d4edda;
+            border-color: #27ae60;
+            color: #155724;
+        }
+        .resultado-opciones label.no-apto {
+            background: #f8d7da;
+            border-color: #e74c3c;
+            color: #721c24;
+        }
+
+        .firma-final {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        .firma-final label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .firma-final input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #333;
+            padding: 8px;
+            font-size: 14px;
+            outline: none;
+            text-align: center;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-pdf {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-pdf:hover { background: #c0392b; transform: translateY(-2px); }
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        .btn-whatsapp:hover { background: #128c7e; transform: translateY(-2px); }
+        .btn-reset {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-reset:hover { background: #7f8c8d; }
+        .btn-guardar {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-guardar:hover { background: #1e8449; transform: translateY(-2px); }
+
+        .historial-section {
+            margin-top: 30px;
+        }
+        .historial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .historial-header h3 {
+            color: white;
+            font-size: 20px;
+        }
+        .historial-count {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .reporte-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .reporte-info h4 {
+            color: #1e8449;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .reporte-info p {
+            color: #666;
+            font-size: 13px;
+        }
+        .reporte-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-small {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-del { background: #e74c3c; color: white; }
+        .btn-del:hover { background: #c0392b; }
+        .btn-view { background: #27ae60; color: white; }
+        .btn-view:hover { background: #1e8449; }
+        .btn-wa-small { background: #25d366; color: white; }
+        .btn-wa-small:hover { background: #128c7e; }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            opacity: 0.7;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .modal-header h3 { color: #1e8449; font-size: 20px; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+        }
+        .modal-close:hover { color: #333; }
+
+        @media (max-width: 768px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .actions-bar { flex-direction: column; }
+            th { font-size: 11px; padding: 8px 4px; }
+            td { padding: 8px 4px; }
+            .reporte-card { flex-direction: column; align-items: flex-start; }
+        }
+
+        /* Modo PDF */
+        .pdf-mode {
+            background: white !important;
+            padding: 0 !important;
+        }
+        .pdf-mode .header-app, .pdf-mode .actions-bar, .pdf-mode .resumen-box,
+        .pdf-mode .historial-section, .pdf-mode .modal-overlay { display: none !important; }
+        .pdf-mode .form-card { box-shadow: none !important; border-radius: 0 !important; margin-bottom: 0 !important; }
+        .pdf-mode .radio-option .check-btn {
+            border: 2px solid #333 !important;
+            color: #333 !important;
+            background: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.bueno {
+            background: #27ae60 !important; color: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.malo {
+            background: #e74c3c !important; color: white !important;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-app">
+            <h1>🌿 Sistema de Preoperacionales</h1>
+            <p>Complete el formulario, guarde en historial, genere PDF y notifique vía WhatsApp</p>
+        </div>
+
+        <div class="form-card" id="form-content">
+            <div class="form-header">
+                <h2>📋 Formato Preoperacional: Guadañadora / Desbrozadora</h2>
+            </div>
+
+            <div class="form-body">
+                <div class="section-title"><span class="icon">📄</span> Información del Equipo</div>
+                <div class="info-grid">
+                    <div class="field-group">
+                        <label>Fecha</label>
+                        <input type="date" id="fecha">
+                    </div>
+                    <div class="field-group">
+                        <label>Operador Responsable</label>
+                        <input type="text" id="operador" placeholder="Nombre completo del operador">
+                    </div>
+                </div>
+
+                <div class="resumen-box" id="resumen-box">
+                    <div class="resumen-item">
+                        <div class="num" id="total-ok">0</div>
+                        <div class="label">✓ Bueno</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="num" id="total-bad">0</div>
+                        <div class="label">✗ Malo</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="num" id="total-pend">0</div>
+                        <div class="label">Pendientes</div>
+                    </div>
+                </div>
+
+                <div class="section-title"><span class="icon">✅</span> Lista de Chequeo (Marcar con ✓ o X)</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Elemento a Inspeccionar</th>
+                            <th>Bueno</th>
+                            <th>Malo</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-verificacion"></tbody>
+                </table>
+
+                <div class="epp-section">
+                    <h3>🦺 Elementos de Protección Personal (EPP)</h3>
+                    <p style="font-size:13px;color:#7d6608;margin-bottom:10px;">Obligatorios para la operación:</p>
+                    <div id="epp-lista"></div>
+                </div>
+
+                <div class="notas-seguridad">
+                    <h3>⚠️ Notas de Seguridad</h3>
+                    <ol>
+                        <li><strong>Zona de Seguridad:</strong> Mantener un radio mínimo de 15 metros de distancia con otras personas durante la operación.</li>
+                        <li><strong>Cuchillas:</strong> Si la cuchilla está golpeada o doblada, nunca intente enderezarla; cámbiela de inmediato (puede fracturarse y salir disparada).</li>
+                        <li><strong>Limpieza:</strong> Retire residuos de pasto acumulados en el protector para evitar sobrecalentamiento.</li>
+                        <li><strong>Transporte:</strong> Apague el equipo y coloque el protector de cuchilla (si aplica) antes de trasladarse.</li>
+                    </ol>
+                </div>
+
+                <div class="resultado-box">
+                    <h3>📊 Resultado de la Inspección</h3>
+                    <div class="resultado-opciones">
+                        <label class="apto">
+                            <input type="radio" name="resultado" value="APTO" onchange="actualizarResultado()">
+                            <span>✅ APTO para operar</span>
+                        </label>
+                        <label class="no-apto">
+                            <input type="radio" name="resultado" value="NO_APTO" onchange="actualizarResultado()">
+                            <span>❌ NO APTO (Equipo fuera de servicio para mantenimiento)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="firma-final">
+                    <label>Firma del Operador</label>
+                    <input type="text" id="firma-operador" placeholder="Nombre y firma del operador">
+                </div>
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-reset" onclick="limpiarFormulario()">🔄 Limpiar</button>
+                <button class="btn btn-guardar" onclick="guardarReporte()">💾 Guardar en Historial</button>
+                <button class="btn btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
+                <button class="btn btn-whatsapp" onclick="enviarWhatsApp()">💬 Enviar WhatsApp</button>
+            </div>
+        </div>
+
+        <div class="historial-section" id="historial-section">
+            <div class="historial-header">
+                <h3>📁 Historial de Reportes Guardados</h3>
+                <span class="historial-count" id="historial-count">0 reportes</span>
+            </div>
+            <div id="historial-lista"></div>
+        </div>
+    </div>
+
+    <!-- Modal para ver reporte -->
+    <div class="modal-overlay" id="modal-ver">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Ver Reporte Guardado</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+            <div style="margin-top:20px; text-align:center;">
+                <button class="btn btn-pdf" onclick="descargarDesdeModal()">📄 Descargar este PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const elementos = [
+            { tipo: 'header', texto: '1. Motor y Energía' },
+            { tipo: 'item', texto: 'Mezcla de combustible (Gasolina + Aceite 2T) correcta' },
+            { tipo: 'item', texto: 'Tapa de combustible sellada y sin fugas' },
+            { tipo: 'item', texto: 'Estado del filtro de aire' },
+            { tipo: 'item', texto: 'Funcionamiento del interruptor de parada (On/Off)' },
+            { tipo: 'item', texto: 'Estado del cordón de arranque (piola)' },
+            { tipo: 'header', texto: '2. Transmisión y Mandos' },
+            { tipo: 'item', texto: 'Gatillo de aceleración y bloqueo de seguridad' },
+            { tipo: 'item', texto: 'Estado del manillar y sujeción' },
+            { tipo: 'item', texto: 'Engrase de la caja de engranajes (cabezal)' },
+            { tipo: 'item', texto: 'Tubo de transmisión derecho y sin golpes' },
+            { tipo: 'header', texto: '3. Sistema de Corte y Protección' },
+            { tipo: 'item', texto: 'Cuchilla/Yoyo (sin grietas, fisuras o desgaste extremo)' },
+            { tipo: 'item', texto: 'Protector de corte (Guarda) instalado y firme' },
+            { tipo: 'item', texto: 'Ajuste de la tuerca/tornillo del cabezal' },
+            { tipo: 'item', texto: 'Plato de fricción/soporte en buen estado' },
+            { tipo: 'header', texto: '4. Arnés y Ergonomía' },
+            { tipo: 'item', texto: 'Arnés de carga (rehalas) sin desgarres' },
+            { tipo: 'item', texto: 'Gancho de sujeción de liberación rápida funcional' },
+            { tipo: 'item', texto: 'Almohadilla de protección lateral' }
+        ];
+
+        const eppItems = [
+            'Careta de policarbonato o malla',
+            'Gafas de seguridad (protección interna)',
+            'Protección auditiva (copa o inserción)',
+            'Guantes de vaqueta o con protección antivibración',
+            'Canilleras/Polainas rígidas',
+            'Botas de seguridad (con puntera)',
+            'Peto o delantal de protección'
+        ];
+
+        let idCounter = 0;
+        function genId() { return 'chk_' + (idCounter++); }
+        let reportesGuardados = [];
+        let reporteActualEnModal = null;
+
+        // Renderizar tabla
+        function renderTabla() {
+            const tbody = document.getElementById('tabla-verificacion');
+            tbody.innerHTML = '';
+            elementos.forEach((elem) => {
+                if (elem.tipo === 'header') {
+                    const row = document.createElement('tr');
+                    row.className = 'subheader';
+                    row.innerHTML = `<td colspan="4">${elem.texto}</td>`;
+                    tbody.appendChild(row);
+                } else {
+                    const id = genId();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${elem.texto}</td>
+                        <td>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="${id}" value="bueno" onchange="actualizarResumen()">
+                                    <span class="check-btn bueno">✓</span>
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="${id}" value="malo" onchange="actualizarResumen()">
+                                    <span class="check-btn malo">✗</span>
+                                </label>
+                            </div>
+                        </td>
+                        <td><input type="text" class="obs-input" placeholder="Obs..." data-item="${elem.texto}"></td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+        }
+
+        // Renderizar EPP
+        function renderEPP() {
+            const container = document.getElementById('epp-lista');
+            eppItems.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'epp-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="epp_${idx}" data-epp="${item}">
+                    <label for="epp_${idx}">${item}</label>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Actualizar resumen
+        function actualizarResumen() {
+            let ok = 0, bad = 0, pend = 0;
+            const radios = document.querySelectorAll('input[type="radio"]:checked');
+            radios.forEach(r => {
+                if (r.value === 'bueno') ok++;
+                else if (r.value === 'malo') bad++;
+            });
+            const totalItems = elementos.filter(e => e.tipo === 'item').length;
+            pend = totalItems - ok - bad;
+
+            document.getElementById('total-ok').textContent = ok;
+            document.getElementById('total-bad').textContent = bad;
+            document.getElementById('total-pend').textContent = pend;
+        }
+
+        function actualizarResultado() {
+            // Actualiza visual del resultado si es necesario
+        }
+
+        // Obtener datos del formulario
+        function obtenerDatosFormulario() {
+            const datos = {
+                fecha: document.getElementById('fecha').value,
+                operador: document.getElementById('operador').value,
+                firmaOperador: document.getElementById('firma-operador').value,
+                resultado: document.querySelector('input[name="resultado"]:checked')?.value || '',
+                items: [],
+                epp: [],
+                timestamp: new Date().toISOString()
+            };
+
+            // Recorrer items
+            const rows = document.querySelectorAll('#tabla-verificacion tr');
+            let currentHeader = '';
+            rows.forEach(row => {
+                if (row.classList.contains('subheader')) {
+                    currentHeader = row.textContent.trim();
+                } else {
+                    const cells = row.querySelectorAll('td');
+                    const itemText = cells[0].textContent.trim();
+                    let valor = '';
+                    const radios = row.querySelectorAll('input[type="radio"]');
+                    radios.forEach(r => { if (r.checked) valor = r.value; });
+                    const obs = cells[3] ? cells[3].querySelector('input').value : '';
+                    datos.items.push({
+                        categoria: currentHeader,
+                        item: itemText,
+                        valor: valor,
+                        observaciones: obs
+                    });
+                }
+            });
+
+            // EPP
+            document.querySelectorAll('.epp-item input[type="checkbox"]').forEach(cb => {
+                datos.epp.push({
+                    item: cb.getAttribute('data-epp'),
+                    checked: cb.checked
+                });
+            });
+
+            datos.totalOk = datos.items.filter(i => i.valor === 'bueno').length;
+            datos.totalBad = datos.items.filter(i => i.valor === 'malo').length;
+            datos.totalEpp = datos.epp.filter(e => e.checked).length;
+
+            return datos;
+        }
+
+        // Guardar reporte
+        function guardarReporte() {
+            const datos = obtenerDatosFormulario();
+            if (!datos.fecha) {
+                alert('Por favor ingrese la fecha.');
+                return;
+            }
+            if (!datos.operador) {
+                alert('Por favor ingrese el nombre del operador responsable.');
+                return;
+            }
+            if (!datos.resultado) {
+                alert('Por favor seleccione el resultado de la inspección.');
+                return;
+            }
+
+            reportesGuardados.push(datos);
+            renderHistorial();
+            alert('✅ Reporte guardado en el historial exitosamente.');
+        }
+
+        // Renderizar historial
+        function renderHistorial() {
+            const lista = document.getElementById('historial-lista');
+            const count = document.getElementById('historial-count');
+            count.textContent = `${reportesGuardados.length} reporte${reportesGuardados.length !== 1 ? 's' : ''}`;
+
+            if (reportesGuardados.length === 0) {
+                lista.innerHTML = '<div class="empty-state">No hay reportes guardados aún. Complete el formulario y presione "Guardar en Historial".</div>';
+                return;
+            }
+
+            lista.innerHTML = '';
+            reportesGuardados.forEach((rep, idx) => {
+                const card = document.createElement('div');
+                card.className = 'reporte-card';
+                const fechaStr = rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : 'Sin fecha';
+                const resultadoText = rep.resultado === 'APTO' ? '✅ APTO' : '❌ NO APTO';
+                const resultadoColor = rep.resultado === 'APTO' ? '#27ae60' : '#e74c3c';
+                card.innerHTML = `
+                    <div class="reporte-info">
+                        <h4>🌿 Guadañadora — ${rep.operador}</h4>
+                        <p>📅 ${fechaStr} | ${resultadoText} | ✓ ${rep.totalOk} ✗ ${rep.totalBad} | 🦺 EPP: ${rep.totalEpp}/7</p>
+                    </div>
+                    <div class="reporte-actions">
+                        <button class="btn-small btn-view" onclick="verReporte(${idx})">👁️ Ver</button>
+                        <button class="btn-small btn-wa-small" onclick="enviarWhatsAppHistorial(${idx})">💬 WA</button>
+                        <button class="btn-small btn-del" onclick="eliminarReporte(${idx})">🗑️ Borrar</button>
+                    </div>
+                `;
+                lista.appendChild(card);
+            });
+        }
+
+        // Ver reporte en modal
+        function verReporte(idx) {
+            const rep = reportesGuardados[idx];
+            reporteActualEnModal = rep;
+            const modalBody = document.getElementById('modal-body');
+
+            let itemsHtml = '';
+            let currentCat = '';
+            rep.items.forEach(it => {
+                if (it.categoria !== currentCat) {
+                    currentCat = it.categoria;
+                    itemsHtml += `<tr style="background:#d5f5e3;font-weight:700;color:#1e8449;"><td colspan="3">${currentCat}</td></tr>`;
+                }
+                const valText = it.valor === 'bueno' ? '<span style="color:#27ae60;font-weight:700;">✓ Bueno</span>' :
+                               it.valor === 'malo' ? '<span style="color:#e74c3c;font-weight:700;">✗ Malo</span>' :
+                               '<span style="color:#999;">—</span>';
+                itemsHtml += `<tr>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;">${it.item}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;text-align:center;">${valText}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;font-size:12px;color:#666;">${it.observaciones || '-'}</td>
+                </tr>`;
+            });
+
+            let eppHtml = '';
+            rep.epp.forEach(e => {
+                const check = e.checked ? '✅' : '⬜';
+                eppHtml += `<li style="padding:4px 0;">${check} ${e.item}</li>`;
+            });
+
+            const resultadoText = rep.resultado === 'APTO' ? '✅ APTO para operar' : '❌ NO APTO (Equipo fuera de servicio)';
+
+            modalBody.innerHTML = `
+                <div style="margin-bottom:15px;line-height:1.8;">
+                    <p><strong>Fecha:</strong> ${rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : '—'}</p>
+                    <p><strong>Operador:</strong> ${rep.operador || '—'}</p>
+                    <p><strong>Firma:</strong> ${rep.firmaOperador || '—'}</p>
+                    <p><strong>Resultado:</strong> ${resultadoText}</p>
+                </div>
+                <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:20px;">
+                    <thead>
+                        <tr style="background:#27ae60;color:white;">
+                            <th style="padding:10px;text-align:left;">Elemento</th>
+                            <th style="padding:10px;text-align:center;width:100px;">Estado</th>
+                            <th style="padding:10px;text-align:left;width:200px;">Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>${itemsHtml}</tbody>
+                </table>
+                <div style="background:#fff9e6;padding:15px;border-radius:8px;margin-bottom:15px;">
+                    <h4 style="color:#7d6608;margin-bottom:10px;">🦺 EPP Verificado</h4>
+                    <ul style="list-style:none;padding:0;font-size:13px;color:#444;">${eppHtml}</ul>
+                </div>
+            `;
+            document.getElementById('modal-ver').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-ver').classList.remove('active');
+            reporteActualEnModal = null;
+        }
+
+        function descargarDesdeModal() {
+            if (!reporteActualEnModal) return;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `
+                <div style="padding:20px;font-family:Arial,sans-serif;">
+                    <h2 style="color:#1e8449;text-align:center;margin-bottom:20px;">Formato Preoperacional: Guadañadora / Desbrozadora</h2>
+                    ${document.getElementById('modal-body').innerHTML}
+                </div>
+            `;
+            document.body.appendChild(tempDiv);
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Preoperacional_Guadanadora_${reporteActualEnModal.fecha || 'sinfecha'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(tempDiv).save().then(() => {
+                document.body.removeChild(tempDiv);
+            });
+        }
+
+        // Eliminar reporte
+        function eliminarReporte(idx) {
+            if (confirm('¿Está seguro de eliminar este reporte del historial?')) {
+                reportesGuardados.splice(idx, 1);
+                renderHistorial();
+            }
+        }
+
+        // Enviar WhatsApp desde historial
+        function enviarWhatsAppHistorial(idx) {
+            const rep = reportesGuardados[idx];
+            const fechaStr = rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : 'Sin fecha';
+            const resultadoEmoji = rep.resultado === 'APTO' ? '✅' : '❌';
+
+            const mensaje = `*PREOPERACIONAL GUADAÑADORA / DESBROZADORA*\n\n` +
+                `📅 Fecha: ${fechaStr}\n` +
+                `👤 Operador: ${rep.operador || 'Sin operador'}\n\n` +
+                `✓ Bueno: ${rep.totalOk} | ✗ Malo: ${rep.totalBad}\n` +
+                `🦺 EPP verificado: ${rep.totalEpp}/7\n\n` +
+                `${resultadoEmoji} Resultado: ${rep.resultado === 'APTO' ? 'APTO para operar' : 'NO APTO'}\n\n` +
+                `Reporte guardado en historial local.`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        // Generar PDF del formulario actual
+        function generarPDF() {
+            const operador = document.getElementById('operador').value || 'sin_operador';
+            const fecha = document.getElementById('fecha').value || new Date().toISOString().split('T')[0];
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Preoperacional_Guadanadora_${operador}_${fecha}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            document.body.classList.add('pdf-mode');
+            html2pdf().set(opt).from(document.getElementById('form-content')).save().then(() => {
+                document.body.classList.remove('pdf-mode');
+            }).catch(() => {
+                document.body.classList.remove('pdf-mode');
+            });
+        }
+
+        // Enviar WhatsApp del formulario actual
+        function enviarWhatsApp() {
+            const fecha = document.getElementById('fecha').value || new Date().toLocaleDateString();
+            const operador = document.getElementById('operador').value || 'Sin operador';
+            const resultado = document.querySelector('input[name="resultado"]:checked')?.value || '';
+
+            let ok = 0, bad = 0;
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => {
+                if (r.value === 'bueno') ok++;
+                else if (r.value === 'malo') bad++;
+            });
+
+            let eppCount = 0;
+            document.querySelectorAll('.epp-item input[type="checkbox"]').forEach(cb => {
+                if (cb.checked) eppCount++;
+            });
+
+            const resultadoEmoji = resultado === 'APTO' ? '✅' : resultado === 'NO_APTO' ? '❌' : '⬜';
+            const resultadoText = resultado === 'APTO' ? 'APTO para operar' :
+                                 resultado === 'NO_APTO' ? 'NO APTO (fuera de servicio)' : 'Sin resultado definido';
+
+            const mensaje = `*PREOPERACIONAL GUADAÑADORA / DESBROZADORA*\n\n` +
+                `📅 Fecha: ${fecha}\n` +
+                `👤 Operador: ${operador}\n\n` +
+                `✓ Bueno: ${ok} | ✗ Malo: ${bad}\n` +
+                `🦺 EPP verificado: ${eppCount}/7\n\n` +
+                `${resultadoEmoji} Resultado: ${resultadoText}\n\n` +
+                `El reporte PDF ha sido generado y guardado localmente.`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+            if(confirm('¿Está seguro de limpiar todo el formulario?')) {
+                document.querySelectorAll('input[type="text"], input[type="date"]').forEach(el => el.value = '');
+                document.querySelectorAll('input[type="radio"]:checked').forEach(el => el.checked = false);
+                document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+                document.querySelectorAll('.obs-input').forEach(el => el.value = '');
+                document.getElementById('fecha').valueAsDate = new Date();
+                actualizarResumen();
+            }
+        }
+
+        // Inicializar
+        renderTabla();
+        renderEPP();
+        document.getElementById('fecha').valueAsDate = new Date();
+        renderHistorial();
+    </script>
+</body>
+</html>

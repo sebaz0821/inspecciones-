@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preoperacional - Inspección de Motobomba</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .app-container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        .header-app {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+        .header-app h1 { font-size: 26px; margin-bottom: 5px; }
+        .header-app p { opacity: 0.9; font-size: 14px; }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: #1a5276;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .form-header h2 { font-size: 22px; }
+
+        .form-body { padding: 30px; }
+
+        .section-title {
+            color: #1a5276;
+            font-size: 17px;
+            font-weight: 700;
+            margin: 25px 0 15px 0;
+            padding: 10px 15px;
+            background: #eaf2f8;
+            border-left: 5px solid #2980b9;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 20px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .field-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .field-group input, .field-group select {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .field-group input:focus, .field-group select:focus {
+            border-color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin: 10px 0 20px 0;
+        }
+        th {
+            background: #2980b9;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        th:first-child { text-align: left; width: 40%; }
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e8e8e8;
+            text-align: center;
+        }
+        td:first-child { text-align: left; font-weight: 500; color: #2c3e50; }
+        tr:nth-child(even) { background: #f8f9fa; }
+
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .radio-option {
+            position: relative;
+            cursor: pointer;
+        }
+        .radio-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0; height: 0;
+        }
+        .radio-option .check-btn {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            line-height: 32px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.2s;
+            color: #888;
+        }
+        .radio-option input:checked + .check-btn.bueno {
+            background: #27ae60; border-color: #27ae60; color: white;
+        }
+        .radio-option input:checked + .check-btn.malo {
+            background: #e74c3c; border-color: #e74c3c; color: white;
+        }
+        .radio-option input:checked + .check-btn.na {
+            background: #95a5a6; border-color: #95a5a6; color: white;
+        }
+
+        .obs-input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 12px;
+            outline: none;
+        }
+        .obs-input:focus { border-color: #2980b9; }
+
+        .prueba-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .prueba-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .prueba-item:last-child { border-bottom: none; }
+        .prueba-item span { font-weight: 500; color: #2c3e50; }
+        .prueba-options {
+            display: flex;
+            gap: 15px;
+        }
+        .prueba-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid #ddd;
+            transition: all 0.2s;
+        }
+        .prueba-options input { display: none; }
+        .prueba-options input:checked + span.si {
+            background: #d4edda; border-color: #27ae60; color: #155724;
+        }
+        .prueba-options input:checked + span.no {
+            background: #f8d7da; border-color: #e74c3c; color: #721c24;
+        }
+
+        .notas-box {
+            margin: 20px 0;
+        }
+        .notas-box label {
+            display: block;
+            font-weight: 600;
+            color: #1a5276;
+            margin-bottom: 8px;
+        }
+        .notas-box textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+        }
+        .notas-box textarea:focus { border-color: #2980b9; }
+
+        .alerta-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #856404;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .firmas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .firma-field {
+            text-align: center;
+        }
+        .firma-field input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #333;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 5px;
+        }
+        .firma-field label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-pdf {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-pdf:hover { background: #c0392b; transform: translateY(-2px); }
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        .btn-whatsapp:hover { background: #128c7e; transform: translateY(-2px); }
+        .btn-reset {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-reset:hover { background: #7f8c8d; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+        .status-ok { background: #d4edda; color: #155724; }
+        .status-alert { background: #f8d7da; color: #721c24; }
+
+        @media (max-width: 600px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .firmas-grid { grid-template-columns: 1fr; }
+            .actions-bar { flex-direction: column; }
+            .prueba-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+            th { font-size: 11px; padding: 8px 4px; }
+            td { padding: 8px 4px; }
+        }
+
+        /* Estilos para PDF */
+        .pdf-mode {
+            background: white !important;
+            padding: 0 !important;
+        }
+        .pdf-mode .header-app, .pdf-mode .actions-bar { display: none !important; }
+        .pdf-mode .form-card { box-shadow: none !important; border-radius: 0 !important; }
+        .pdf-mode .radio-option .check-btn {
+            border: 2px solid #333 !important;
+            color: #333 !important;
+            background: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.bueno {
+            background: #27ae60 !important; color: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.malo {
+            background: #e74c3c !important; color: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.na {
+            background: #95a5a6 !important; color: white !important;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-app">
+            <h1>🔧 Sistema de Preoperacionales</h1>
+            <p>Complete el formulario, genere el PDF y notifique vía WhatsApp</p>
+        </div>
+
+        <div class="form-card" id="form-content">
+            <div class="form-header">
+                <h2>📋 Formato de Inspección de Motobomba</h2>
+            </div>
+
+            <div class="form-body">
+                <div class="section-title"><span class="icon">📄</span> Información General</div>
+                <div class="info-grid">
+                    <div class="field-group">
+                        <label>Fecha</label>
+                        <input type="date" id="fecha">
+                    </div>
+                    <div class="field-group">
+                        <label>Ubicación / Proyecto</label>
+                        <input type="text" id="ubicacion" placeholder="Ej: Obra Central - Sector A">
+                    </div>
+                    <div class="field-group">
+                        <label>Código / ID Equipo</label>
+                        <input type="text" id="codigo" placeholder="Ej: MB-001">
+                    </div>
+                    <div class="field-group">
+                        <label>Marca / Modelo</label>
+                        <input type="text" id="marca" placeholder="Ej: Honda WB30XT">
+                    </div>
+                    <div class="field-group">
+                        <label>Responsable de Inspección</label>
+                        <input type="text" id="responsable" placeholder="Nombre completo">
+                    </div>
+                    <div class="field-group">
+                        <label>Turno</label>
+                        <select id="turno">
+                            <option value="">Seleccione...</option>
+                            <option value="Mañana">Mañana</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noche">Noche</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title"><span class="icon">⚙️</span> 1. Estado del Motor (Combustión)</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Elemento a Inspeccionar</th>
+                            <th>Bueno</th>
+                            <th>Malo</th>
+                            <th>N/A</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-motor"></tbody>
+                </table>
+
+                <div class="section-title"><span class="icon">💧</span> 2. Sistema de Bombeo (Hidráulico)</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Elemento a Inspeccionar</th>
+                            <th>Bueno</th>
+                            <th>Malo</th>
+                            <th>N/A</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-bombeo"></tbody>
+                </table>
+
+                <div class="section-title"><span class="icon">🛡️</span> 3. Estructura y Seguridad</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Elemento a Inspeccionar</th>
+                            <th>Bueno</th>
+                            <th>Malo</th>
+                            <th>N/A</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-estructura"></tbody>
+                </table>
+
+                <div class="section-title"><span class="icon">▶️</span> 4. Prueba de Funcionamiento</div>
+                <div class="prueba-box" id="prueba-funcionamiento"></div>
+
+                <div class="notas-box">
+                    <label for="notas-adicionales">📝 Notas Adicionales:</label>
+                    <textarea id="notas-adicionales" placeholder="Registre aquí cualquier observación adicional..."></textarea>
+                </div>
+
+                <div class="alerta-box">
+                    ⚠️ <strong>Importante:</strong> Si se detecta alguna fuga de combustible o falla en el sistema de apagado de emergencia, el equipo debe ser etiquetado como <strong>"FUERA DE SERVICIO"</strong> de inmediato hasta su reparación.
+                </div>
+
+                <div class="firmas-grid">
+                    <div class="firma-field">
+                        <input type="text" id="firma-inspeccionado" placeholder="Nombre y firma">
+                        <label>Inspeccionado por</label>
+                    </div>
+                    <div class="firma-field">
+                        <input type="text" id="firma-revisado" placeholder="Nombre y firma">
+                        <label>Revisado por</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-reset" onclick="limpiarFormulario()">🔄 Limpiar</button>
+                <button class="btn btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
+                <button class="btn btn-whatsapp" onclick="enviarWhatsApp()">💬 Enviar WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de los elementos a inspeccionar
+        const elementosMotor = [
+            "Nivel de aceite del motor",
+            "Nivel de combustible",
+            "Estado del filtro de aire",
+            "Bujía y cables de encendido",
+            "Ausencia de fugas de líquidos",
+            "Estado del tanque y tapón"
+        ];
+
+        const elementosBombeo = [
+            "Estado de la carcasa de la bomba",
+            "Sellos mecánicos / Empaquetadura",
+            "Válvula de pie (Pichancha) y filtro",
+            "Estado de mangueras (Succión/Descarga)",
+            "Acoples y abrazaderas",
+            "Cebado de la bomba"
+        ];
+
+        const elementosEstructura = [
+            "Chasis / Estructura de soporte",
+            "Soportes antivibratorios (Silentblocks)",
+            "Estado del sistema de arranque (Piola)",
+            "Limpieza general del equipo",
+            "Presencia de extintor cercano"
+        ];
+
+        const pruebasFuncionamiento = [
+            "¿Arranca con facilidad?",
+            "¿Presenta ruidos extraños?",
+            "¿Presión de salida constante?",
+            "¿Humo excesivo en el escape?"
+        ];
+
+        // Generar IDs únicos
+        let idCounter = 0;
+        function genId() { return 'item_' + (idCounter++); }
+
+        // Renderizar tablas
+        function renderTabla(elementos, containerId) {
+            const tbody = document.getElementById(containerId);
+            elementos.forEach(elem => {
+                const id = genId();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${elem}</td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="bueno">
+                                <span class="check-btn bueno">✓</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="malo">
+                                <span class="check-btn malo">✗</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="na">
+                                <span class="check-btn na">N/A</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td><input type="text" class="obs-input" placeholder="Obs..." data-item="${elem}"></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Renderizar pruebas de funcionamiento
+        function renderPruebas() {
+            const container = document.getElementById('prueba-funcionamiento');
+            pruebasFuncionamiento.forEach((pregunta, idx) => {
+                const id = 'prueba_' + idx;
+                const div = document.createElement('div');
+                div.className = 'prueba-item';
+                div.innerHTML = `
+                    <span>${pregunta}</span>
+                    <div class="prueba-options">
+                        <label>
+                            <input type="radio" name="${id}" value="si">
+                            <span class="si">✓ Sí</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="${id}" value="no">
+                            <span class="no">✗ No</span>
+                        </label>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Inicializar
+        renderTabla(elementosMotor, 'tabla-motor');
+        renderTabla(elementosBombeo, 'tabla-bombeo');
+        renderTabla(elementosEstructura, 'tabla-estructura');
+        renderPruebas();
+
+        // Fecha por defecto = hoy
+        document.getElementById('fecha').valueAsDate = new Date();
+
+        // Generar PDF
+        function generarPDF() {
+            const element = document.getElementById('form-content');
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Preoperacional_Motobomba_${document.getElementById('codigo').value || 'sin_codigo'}_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Agregar clase para modo PDF
+            document.body.classList.add('pdf-mode');
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.classList.remove('pdf-mode');
+            }).catch(() => {
+                document.body.classList.remove('pdf-mode');
+            });
+        }
+
+        // Enviar WhatsApp
+        function enviarWhatsApp() {
+            const codigo = document.getElementById('codigo').value || 'Sin código';
+            const ubicacion = document.getElementById('ubicacion').value || 'Sin ubicación';
+            const responsable = document.getElementById('responsable').value || 'Sin responsable';
+            const fecha = document.getElementById('fecha').value || new Date().toLocaleDateString();
+
+            // Contar hallazgos
+            let malos = 0;
+            document.querySelectorAll('input[type="radio"][value="malo"]:checked').forEach(() => malos++);
+
+            let estado = malos === 0 ? '✅ EQUIPO APTO PARA OPERAR' : `⚠️ EQUIPO CON ${malos} HALLAZGO(S) - REVISAR`;
+
+            const mensaje = `*PREOPERACIONAL MOTOBOMBA*\n\n` +
+                `📅 Fecha: ${fecha}\n` +
+                `🔧 Equipo: ${codigo}\n` +
+                `📍 Ubicación: ${ubicacion}\n` +
+                `👤 Responsable: ${responsable}\n\n` +
+                `${estado}\n\n` +
+                `El reporte PDF ha sido generado y guardado localmente.`;
+
+            const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        }
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+            if(confirm('¿Está seguro de limpiar todo el formulario?')) {
+                document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(el => el.value = '');
+                document.querySelectorAll('input[type="radio"]:checked').forEach(el => el.checked = false);
+                document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+                document.getElementById('fecha').valueAsDate = new Date();
+            }
+        }
+    </script>
+</body>
+</html>

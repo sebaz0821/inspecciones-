@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspección Mensual de Extintores</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        .nav-tab:hover { background: #e9ecef; color: #495057; }
+        .nav-tab.active {
+            background: white;
+            color: #2a5298;
+            border-bottom: 3px solid #2a5298;
+        }
+        .tab-content { display: none; padding: 30px; }
+        .tab-content.active { display: block; }
+        
+        .section-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        
+        .extintor-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .extintor-card:hover { border-color: #667eea; box-shadow: 0 5px 15px rgba(102,126,234,0.2); }
+        .extintor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .extintor-id {
+            background: #2a5298;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+        
+        .checklist-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .checklist-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .checklist-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .checklist-table tr:hover { background: #f8f9fa; }
+        
+        .status-select {
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 2px solid #e0e0e0;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .status-b { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .status-m { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .warning-box .icon { font-size: 2em; }
+        
+        .result-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .result-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .result-btn {
+            padding: 15px 40px;
+            border: 3px solid;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .result-btn.operativo {
+            border-color: #28a745;
+            color: #28a745;
+            background: white;
+        }
+        .result-btn.operativo:hover, .result-btn.operativo.active {
+            background: #28a745;
+            color: white;
+        }
+        .result-btn.no-operativo {
+            border-color: #dc3545;
+            color: #dc3545;
+            background: white;
+        }
+        .result-btn.no-operativo:hover, .result-btn.no-operativo.active {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-success { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; }
+        .btn-info { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #333; }
+        .btn-danger { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        .history-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .history-item:hover { border-color: #667eea; }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .history-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .status-ok { background: #d4edda; color: #155724; }
+        .status-bad { background: #f8d7da; color: #721c24; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-content h2 { margin-bottom: 20px; color: #333; }
+        .modal-content p { margin-bottom: 20px; color: #666; }
+        
+        .recommendations {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+        }
+        .recommendations h3 { color: #856404; margin-bottom: 10px; }
+        .recommendations ol { margin-left: 20px; color: #856404; }
+        .recommendations li { margin-bottom: 8px; }
+        
+        .individual-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .individual-table th, .individual-table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: center;
+        }
+        .individual-table th {
+            background: #2a5298;
+            color: white;
+        }
+        .individual-table td { background: white; }
+        .individual-table input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .container { box-shadow: none; }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .result-buttons { flex-direction: column; }
+            .action-buttons { flex-direction: column; }
+            .nav-tabs { flex-direction: column; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .signature-pad {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .signature-pad:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .hallazgos-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        .hallazgos-section textarea {
+            width: 100%;
+            min-height: 80px;
+            margin-top: 10px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            resize: vertical;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧯 Inspección Mensual de Extintores</h1>
+            <p>Formulario de Control y Verificación de Equipos Contra Incendios</p>
+        </div>
+        
+        <div class="nav-tabs no-print">
+            <button class="nav-tab active" onclick="showTab('formulario')">📋 Formulario</button>
+            <button class="nav-tab" onclick="showTab('historial')">📁 Historial</button>
+        </div>
+        
+        <!-- TAB FORMULARIO -->
+        <div id="formulario" class="tab-content active">
+            <form id="inspectionForm">
+                <!-- INFORMACIÓN GENERAL -->
+                <div class="section-title">📋 Información General</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Fecha de Inspección</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Responsable de Inspección</label>
+                        <input type="text" id="responsable" placeholder="Nombre completo" required>
+                    </div>
+                </div>
+                
+                <!-- DATOS DEL EQUIPO -->
+                <div class="section-title">1. Datos del Equipo</div>
+                <div id="extintores-container">
+                    <div class="extintor-card" data-id="1">
+                        <div class="extintor-header">
+                            <span class="extintor-id">Extintor #01</span>
+                            <button type="button" class="btn btn-danger" onclick="removeExtintor(this)" style="padding:5px 15px; font-size:0.9em;">🗑️ Eliminar</button>
+                        </div>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>ID / Número</label>
+                                <input type="text" class="ext-id" placeholder="Ej: EXT-001" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Ubicación</label>
+                                <input type="text" class="ext-ubicacion" placeholder="Área/Edificio/Piso" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo</label>
+                                <select class="ext-tipo" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="ABC">ABC (Polvo Químico Seco)</option>
+                                    <option value="CO2">CO2 (Dióxido de Carbono)</option>
+                                    <option value="Solkaflam">Solkaflam</option>
+                                    <option value="K">Clase K (Cocina)</option>
+                                    <option value="Agua">Agua Presurizada</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Capacidad (lbs/kg)</label>
+                                <input type="text" class="ext-capacidad" placeholder="Ej: 10 lbs">
+                            </div>
+                            <div class="form-group">
+                                <label>Última Recarga</label>
+                                <input type="date" class="ext-recarga">
+                            </div>
+                            <div class="form-group">
+                                <label>Vencimiento</label>
+                                <input type="date" class="ext-vencimiento">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons no-print">
+                    <button type="button" class="btn btn-primary" onclick="addExtintor()">➕ Agregar Extintor</button>
+                </div>
+                
+                <!-- LISTA DE VERIFICACIÓN -->
+                <div class="section-title">2. Lista de Verificación</div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Ítem a Inspeccionar</th>
+                            <th style="width: 15%;">Estado (B/M)</th>
+                            <th style="width: 45%;">Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>📍 Ubicación: ¿Está en el lugar asignado?</td>
+                            <td>
+                                <select class="status-select" data-item="ubicacion" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="ubicacion" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>🚪 Acceso: ¿Está libre de obstáculos y es visible?</td>
+                            <td>
+                                <select class="status-select" data-item="acceso" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="acceso" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>🏷️ Señalización: ¿Tiene el aviso de "Extintor" y es legible?</td>
+                            <td>
+                                <select class="status-select" data-item="senalizacion" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="senalizacion" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>🎚️ Manómetro: ¿La aguja está en la zona verde (presión ok)?</td>
+                            <td>
+                                <select class="status-select" data-item="manometro" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                    <option value="NA">N/A (CO2)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="manometro" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>🔒 Seguro y Sello: ¿Tiene el pasador y precinto intactos?</td>
+                            <td>
+                                <select class="status-select" data-item="seguro" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="seguro" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>🧵 Manguera/Boquilla: ¿Libre de grietas, obstrucciones o nidos?</td>
+                            <td>
+                                <select class="status-select" data-item="manguera" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="manguera" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>🛡️ Cilindro: ¿Sin abolladuras, corrosión o golpes severos?</td>
+                            <td>
+                                <select class="status-select" data-item="cilindro" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="cilindro" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>📄 Etiqueta: ¿Es legible y tiene tarjeta de mantenimiento?</td>
+                            <td>
+                                <select class="status-select" data-item="etiqueta" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="etiqueta" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>🔧 Soporte: ¿Está firme y a la altura correcta (máx. 1.50m)?</td>
+                            <td>
+                                <select class="status-select" data-item="soporte" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="soporte" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td>📢 Corneta (CO2): ¿Está firme y sin fracturas?</td>
+                            <td>
+                                <select class="status-select" data-item="corneta" onchange="updateStatus(this)">
+                                    <option value="">--</option>
+                                    <option value="B">✓ Bueno (B)</option>
+                                    <option value="M">✗ Malo (M)</option>
+                                    <option value="NA">N/A (No CO2)</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="corneta" placeholder="Observaciones..."></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- REGISTRO POR EXTINTOR -->
+                <div class="section-title">3. Registro por Extintor (Control Individual)</div>
+                <div style="overflow-x: auto;">
+                    <table class="individual-table" id="individualTable">
+                        <thead>
+                            <tr>
+                                <th>ID Equipo</th>
+                                <th>Presión</th>
+                                <th>Precinto</th>
+                                <th>Manguera</th>
+                                <th>Cilindro</th>
+                                <th>Ubicación</th>
+                                <th>Firma</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" class="ind-id" placeholder="01" style="width:60px; text-align:center;"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="presion"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="precinto"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="manguera"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="cilindro"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="ubicacion"></td>
+                                <td><input type="text" class="ind-firma" placeholder="Iniciales" style="width:80px; text-align:center;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="ind-id" placeholder="02" style="width:60px; text-align:center;"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="presion"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="precinto"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="manguera"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="cilindro"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="ubicacion"></td>
+                                <td><input type="text" class="ind-firma" placeholder="Iniciales" style="width:80px; text-align:center;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="ind-id" placeholder="03" style="width:60px; text-align:center;"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="presion"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="precinto"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="manguera"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="cilindro"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="ubicacion"></td>
+                                <td><input type="text" class="ind-firma" placeholder="Iniciales" style="width:80px; text-align:center;"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="ind-id" placeholder="04" style="width:60px; text-align:center;"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="presion"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="precinto"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="manguera"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="cilindro"></td>
+                                <td><input type="checkbox" class="ind-check" data-field="ubicacion"></td>
+                                <td><input type="text" class="ind-firma" placeholder="Iniciales" style="width:80px; text-align:center;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="action-buttons no-print">
+                    <button type="button" class="btn btn-primary" onclick="addIndividualRow()">➕ Agregar Fila</button>
+                </div>
+                
+                <!-- ADVERTENCIA DESTACADA -->
+                <div class="warning-box">
+                    <span class="icon">⚠️</span>
+                    <div>
+                        <strong>INSTRUCCIÓN DE SEGURIDAD CRÍTICA</strong><br>
+                        Si un extintor presenta la aguja en la zona roja (baja presión) o blanca (sobrepresión), o si el precinto está roto, <strong>debe enviarse a mantenimiento de forma inmediata</strong>.
+                    </div>
+                </div>
+                
+                <!-- HALLAZGOS Y ACCIONES -->
+                <div class="section-title">4. Hallazgos y Acciones</div>
+                <div class="hallazgos-section">
+                    <div class="form-group">
+                        <label>Hallazgo / Deficiencia Encontrada</label>
+                        <textarea id="hallazgo" placeholder="Describa cualquier anomalía detectada durante la inspección..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Acción Correctiva / Plan de Remediación</label>
+                        <textarea id="accion" placeholder="Describa las acciones a tomar para corregir los hallazgos..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- RECOMENDACIONES -->
+                <div class="recommendations">
+                    <h3>📋 Recomendaciones Adicionales</h3>
+                    <ol>
+                        <li><strong>Limpieza:</strong> Limpie el polvo acumulado en el cilindro para evitar corrosión.</li>
+                        <li><strong>Agitación:</strong> En extintores de polvo químico seco (ABC), inviértalos brevemente una vez al mes para evitar compactación.</li>
+                        <li><strong>Peso:</strong> Para extintores de CO2 (sin manómetro), verifique la carga mediante peso.</li>
+                    </ol>
+                </div>
+                
+                <!-- RESULTADO GLOBAL -->
+                <div class="section-title">📊 Resultado Global de la Inspección</div>
+                <div class="result-section">
+                    <p style="margin-bottom: 20px; color: #666; font-size: 1.1em;">Seleccione el estado final del sistema de extintores inspeccionado:</p>
+                    <div class="result-buttons">
+                        <button type="button" class="result-btn operativo" id="btnOperativo" onclick="setResultado('OPERATIVO')">
+                            ✅ SISTEMA OPERATIVO
+                        </button>
+                        <button type="button" class="result-btn no-operativo" id="btnNoOperativo" onclick="setResultado('NO OPERATIVO')">
+                            ❌ REQUIERE MANTENIMIENTO EXTERNO
+                        </button>
+                    </div>
+                    <input type="hidden" id="resultadoGlobal" value="">
+                </div>
+                
+                <!-- FIRMA -->
+                <div class="section-title">✍️ Firma del Inspector</div>
+                <div class="form-group">
+                    <label>Nombre y Firma del Inspector (SST)</label>
+                    <input type="text" id="firmaInspector" placeholder="Nombre completo del inspector de Seguridad y Salud en el Trabajo" style="margin-bottom: 10px;">
+                    <div class="signature-pad" onclick="alert('En una implementación completa, aquí se activaría un pad de firma digital.')">
+                        ✍️ Haga clic aquí para firmar digitalmente
+                    </div>
+                </div>
+                
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="action-buttons no-print">
+                    <button type="button" class="btn btn-success" onclick="guardarReporte()">
+                        💾 Guardar en Historial
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="generarPDF()">
+                        📄 Descargar PDF
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="enviarWhatsApp()">
+                        💬 Enviar WhatsApp
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="limpiarFormulario()">
+                        🔄 Limpiar Formulario
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- TAB HISTORIAL -->
+        <div id="historial" class="tab-content">
+            <div class="section-title">📁 Historial de Inspecciones</div>
+            <div id="historyList">
+                <p style="text-align: center; color: #999; padding: 40px;">No hay reportes guardados en esta sesión.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Título</h2>
+            <p id="modalMessage">Mensaje</p>
+            <button class="btn btn-primary" onclick="closeModal()">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar fecha actual
+        document.getElementById('fecha').valueAsDate = new Date();
+        
+        // Estado global
+        let historial = [];
+        let extintorCount = 1;
+        let resultadoSeleccionado = '';
+        
+        // Mostrar pestañas
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Agregar extintor
+        function addExtintor() {
+            extintorCount++;
+            const container = document.getElementById('extintores-container');
+            const div = document.createElement('div');
+            div.className = 'extintor-card fade-in';
+            div.setAttribute('data-id', extintorCount);
+            div.innerHTML = `
+                <div class="extintor-header">
+                    <span class="extintor-id">Extintor #${String(extintorCount).padStart(2, '0')}</span>
+                    <button type="button" class="btn btn-danger" onclick="removeExtintor(this)" style="padding:5px 15px; font-size:0.9em;">🗑️ Eliminar</button>
+                </div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>ID / Número</label>
+                        <input type="text" class="ext-id" placeholder="Ej: EXT-00${extintorCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ubicación</label>
+                        <input type="text" class="ext-ubicacion" placeholder="Área/Edificio/Piso" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select class="ext-tipo" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="ABC">ABC (Polvo Químico Seco)</option>
+                            <option value="CO2">CO2 (Dióxido de Carbono)</option>
+                            <option value="Solkaflam">Solkaflam</option>
+                            <option value="K">Clase K (Cocina)</option>
+                            <option value="Agua">Agua Presurizada</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Capacidad (lbs/kg)</label>
+                        <input type="text" class="ext-capacidad" placeholder="Ej: 10 lbs">
+                    </div>
+                    <div class="form-group">
+                        <label>Última Recarga</label>
+                        <input type="date" class="ext-recarga">
+                    </div>
+                    <div class="form-group">
+                        <label>Vencimiento</label>
+                        <input type="date" class="ext-vencimiento">
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        
+        // Eliminar extintor
+        function removeExtintor(btn) {
+            const card = btn.closest('.extintor-card');
+            if (document.querySelectorAll('.extintor-card').length > 1) {
+                card.remove();
+            } else {
+                showModal('Error', 'Debe mantener al menos un extintor en el formulario.');
+            }
+        }
+        
+        // Agregar fila individual
+        function addIndividualRow() {
+            const tbody = document.querySelector('#individualTable tbody');
+            const row = document.createElement('tr');
+            const num = tbody.children.length + 1;
+            row.innerHTML = `
+                <td><input type="text" class="ind-id" placeholder="${String(num).padStart(2, '0')}" style="width:60px; text-align:center;"></td>
+                <td><input type="checkbox" class="ind-check" data-field="presion"></td>
+                <td><input type="checkbox" class="ind-check" data-field="precinto"></td>
+                <td><input type="checkbox" class="ind-check" data-field="manguera"></td>
+                <td><input type="checkbox" class="ind-check" data-field="cilindro"></td>
+                <td><input type="checkbox" class="ind-check" data-field="ubicacion"></td>
+                <td><input type="text" class="ind-firma" placeholder="Iniciales" style="width:80px; text-align:center;"></td>
+            `;
+            tbody.appendChild(row);
+        }
+        
+        // Actualizar estado visual
+        function updateStatus(select) {
+            select.className = 'status-select';
+            if (select.value === 'B') select.classList.add('status-b');
+            if (select.value === 'M') select.classList.add('status-m');
+        }
+        
+        // Seleccionar resultado
+        function setResultado(valor) {
+            resultadoSeleccionado = valor;
+            document.getElementById('resultadoGlobal').value = valor;
+            document.getElementById('btnOperativo').classList.toggle('active', valor === 'OPERATIVO');
+            document.getElementById('btnNoOperativo').classList.toggle('active', valor === 'NO OPERATIVO');
+        }
+        
+        // Guardar reporte
+        function guardarReporte() {
+            const fecha = document.getElementById('fecha').value;
+            const responsable = document.getElementById('responsable').value;
+            
+            if (!fecha || !responsable) {
+                showModal('Campos Requeridos', 'Por favor complete la fecha y el responsable de la inspección.');
+                return;
+            }
+            
+            if (!resultadoSeleccionado) {
+                showModal('Resultado Pendiente', 'Por favor seleccione el resultado global de la inspección (Operativo o No Operativo).');
+                return;
+            }
+            
+            const reporte = {
+                id: Date.now(),
+                fecha: fecha,
+                responsable: responsable,
+                resultado: resultadoSeleccionado,
+                extintores: [],
+                checklist: {},
+                hallazgo: document.getElementById('hallazgo').value,
+                accion: document.getElementById('accion').value,
+                firma: document.getElementById('firmaInspector').value,
+                timestamp: new Date().toLocaleString('es-ES')
+            };
+            
+            // Recopilar extintores
+            document.querySelectorAll('.extintor-card').forEach(card => {
+                reporte.extintores.push({
+                    id: card.querySelector('.ext-id').value,
+                    ubicacion: card.querySelector('.ext-ubicacion').value,
+                    tipo: card.querySelector('.ext-tipo').value,
+                    capacidad: card.querySelector('.ext-capacidad').value,
+                    recarga: card.querySelector('.ext-recarga').value,
+                    vencimiento: card.querySelector('.ext-vencimiento').value
+                });
+            });
+            
+            // Recopilar checklist
+            document.querySelectorAll('.status-select').forEach(select => {
+                reporte.checklist[select.dataset.item] = {
+                    estado: select.value,
+                    observacion: document.querySelector(`.obs-input[data-item="${select.dataset.item}"]`).value
+                };
+            });
+            
+            historial.push(reporte);
+            actualizarHistorial();
+            showModal('✅ Reporte Guardado', `La inspección del ${fecha} ha sido almacenada en el historial de esta sesión.`);
+        }
+        
+        // Actualizar vista de historial
+        function actualizarHistorial() {
+            const container = document.getElementById('historyList');
+            if (historial.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No hay reportes guardados en esta sesión.</p>';
+                return;
+            }
+            
+            container.innerHTML = historial.map(r => `
+                <div class="history-item">
+                    <div class="history-header">
+                        <div>
+                            <strong>📅 ${r.fecha}</strong> | 👤 ${r.responsable}
+                            <br><small style="color: #999;">Guardado: ${r.timestamp}</small>
+                        </div>
+                        <span class="history-status ${r.resultado === 'OPERATIVO' ? 'status-ok' : 'status-bad'}">
+                            ${r.resultado === 'OPERATIVO' ? '✅ OPERATIVO' : '❌ NO OPERATIVO'}
+                        </span>
+                    </div>
+                    <p><strong>Extintores inspeccionados:</strong> ${r.extintores.length}</p>
+                    ${r.hallazgo ? `<p><strong>Hallazgo:</strong> ${r.hallazgo}</p>` : ''}
+                    ${r.accion ? `<p><strong>Acción:</strong> ${r.accion}</p>` : ''}
+                    <div class="action-buttons" style="margin-top: 15px; justify-content: flex-start;">
+                        <button class="btn btn-info" onclick="descargarPDFDesdeHistorial(${r.id})" style="padding: 8px 15px; font-size: 0.9em;">
+                            📄 PDF
+                        </button>
+                        <button class="btn btn-warning" onclick="enviarWhatsAppDesdeHistorial(${r.id})" style="padding: 8px 15px; font-size: 0.9em;">
+                            💬 WhatsApp
+                        </button>
+                        <button class="btn btn-danger" onclick="borrarReporte(${r.id})" style="padding: 8px 15px; font-size: 0.9em;">
+                            🗑️ Borrar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Borrar reporte
+        function borrarReporte(id) {
+            if (confirm('¿Está seguro de eliminar este reporte del historial?')) {
+                historial = historial.filter(r => r.id !== id);
+                actualizarHistorial();
+            }
+        }
+        
+        // Generar PDF
+        async function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Encabezado
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 30, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text('INSPECCIÓN MENSUAL DE EXTINTORES', 105, 15, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text('Formulario de Control y Verificación', 105, 22, { align: 'center' });
+            
+            let y = 40;
+            
+            // Info General
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('INFORMACIÓN GENERAL', 10, y);
+            doc.setFont(undefined, 'normal');
+            y += 8;
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${document.getElementById('fecha').value || 'No especificada'}`, 10, y);
+            doc.text(`Responsable: ${document.getElementById('responsable').value || 'No especificado'}`, 110, y);
+            y += 12;
+            
+            // Datos de Extintores
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('1. DATOS DEL EQUIPO', 10, y);
+            y += 8;
+            
+            document.querySelectorAll('.extintor-card').forEach((card, i) => {
+                if (y > 270) { doc.addPage(); y = 20; }
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+                const id = card.querySelector('.ext-id').value || 'N/A';
+                const ub = card.querySelector('.ext-ubicacion').value || 'N/A';
+                const tipo = card.querySelector('.ext-tipo').value || 'N/A';
+                const cap = card.querySelector('.ext-capacidad').value || 'N/A';
+                doc.text(`Extintor ${i+1}: ID=${id} | Ubicación=${ub} | Tipo=${tipo} | Capacidad=${cap}`, 10, y);
+                y += 6;
+            });
+            y += 6;
+            
+            // Checklist
+            if (y > 240) { doc.addPage(); y = 20; }
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('2. LISTA DE VERIFICACIÓN', 10, y);
+            y += 8;
+            
+            const items = [
+                ['Ubicación', 'ubicacion'],
+                ['Acceso', 'acceso'],
+                ['Señalización', 'senalizacion'],
+                ['Manómetro', 'manometro'],
+                ['Seguro y Sello', 'seguro'],
+                ['Manguera/Boquilla', 'manguera'],
+                ['Cilindro', 'cilindro'],
+                ['Etiqueta', 'etiqueta'],
+                ['Soporte', 'soporte'],
+                ['Corneta (CO2)', 'corneta']
+            ];
+            
+            items.forEach(([label, key]) => {
+                if (y > 280) { doc.addPage(); y = 20; }
+                const select = document.querySelector(`.status-select[data-item="${key}"]`);
+                const obs = document.querySelector(`.obs-input[data-item="${key}"]`);
+                const estado = select ? select.value : '--';
+                const observacion = obs ? obs.value : '';
+                const estadoText = estado === 'B' ? '✓ BUENO' : estado === 'M' ? '✗ MALO' : estado === 'NA' ? 'N/A' : '--';
+                doc.setFontSize(9);
+                doc.text(`${label}: ${estadoText}${observacion ? ' | Obs: ' + observacion : ''}`, 10, y);
+                y += 6;
+            });
+            y += 6;
+            
+            // Hallazgos
+            if (y > 260) { doc.addPage(); y = 20; }
+            const hallazgo = document.getElementById('hallazgo').value;
+            const accion = document.getElementById('accion').value;
+            if (hallazgo || accion) {
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('3. HALLAZGOS Y ACCIONES', 10, y);
+                y += 8;
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+                if (hallazgo) { doc.text(`Hallazgo: ${hallazgo}`, 10, y); y += 6; }
+                if (accion) { doc.text(`Acción: ${accion}`, 10, y); y += 6; }
+                y += 6;
+            }
+            
+            // Resultado
+            if (y > 270) { doc.addPage(); y = 20; }
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            const resultado = document.getElementById('resultadoGlobal').value || 'PENDIENTE';
+            if (resultado === 'OPERATIVO') {
+                doc.setTextColor(40, 167, 69);
+                doc.text('RESULTADO: ✅ SISTEMA OPERATIVO', 105, y, { align: 'center' });
+            } else if (resultado === 'NO OPERATIVO') {
+                doc.setTextColor(220, 53, 69);
+                doc.text('RESULTADO: ❌ REQUIERE MANTENIMIENTO EXTERNO', 105, y, { align: 'center' });
+            } else {
+                doc.setTextColor(0, 0, 0);
+                doc.text('RESULTADO: PENDIENTE', 105, y, { align: 'center' });
+            }
+            y += 12;
+            
+            // Firma
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const firma = document.getElementById('firmaInspector').value;
+            if (firma) {
+                doc.text(`Inspector SST: ${firma}`, 10, y);
+            }
+            
+            // Pie de página
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            doc.text(`Generado el ${new Date().toLocaleString('es-ES')} - Inspección Mensual de Extintores`, 105, 290, { align: 'center' });
+            
+            doc.save(`Inspeccion_Extintores_${document.getElementById('fecha').value || 'sin_fecha'}.pdf`);
+        }
+        
+        // Descargar PDF desde historial
+        function descargarPDFDesdeHistorial(id) {
+            const reporte = historial.find(r => r.id === id);
+            if (!reporte) return;
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 25, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.text('INSPECCIÓN MENSUAL DE EXTINTORES', 105, 12, { align: 'center' });
+            doc.setFontSize(9);
+            doc.text(`Reporte del ${reporte.fecha} - ${reporte.timestamp}`, 105, 20, { align: 'center' });
+            
+            let y = 35;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('INFORMACIÓN GENERAL', 10, y); y += 7;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${reporte.fecha}`, 10, y);
+            doc.text(`Responsable: ${reporte.responsable}`, 110, y); y += 7;
+            doc.text(`Resultado: ${reporte.resultado}`, 10, y); y += 10;
+            
+            doc.setFont(undefined, 'bold');
+            doc.text('EXTINTORES INSPECCIONADOS', 10, y); y += 7;
+            doc.setFont(undefined, 'normal');
+            reporte.extintores.forEach((ext, i) => {
+                doc.setFontSize(9);
+                doc.text(`${i+1}. ID: ${ext.id} | Ubicación: ${ext.ubicacion} | Tipo: ${ext.tipo} | Capacidad: ${ext.capacidad}`, 10, y);
+                y += 5;
+            });
+            y += 5;
+            
+            if (Object.keys(reporte.checklist).length > 0) {
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'bold');
+                doc.text('CHECKLIST DE VERIFICACIÓN', 10, y); y += 7;
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(9);
+                Object.entries(reporte.checklist).forEach(([key, val]) => {
+                    const estado = val.estado === 'B' ? '✓ BUENO' : val.estado === 'M' ? '✗ MALO' : val.estado === 'NA' ? 'N/A' : '--';
+                    doc.text(`${key.toUpperCase()}: ${estado}${val.observacion ? ' | ' + val.observacion : ''}`, 10, y);
+                    y += 5;
+                });
+            }
+            
+            if (reporte.hallazgo || reporte.accion) {
+                y += 5;
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'bold');
+                doc.text('HALLAZGOS Y ACCIONES', 10, y); y += 7;
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(9);
+                if (reporte.hallazgo) { doc.text(`Hallazgo: ${reporte.hallazgo}`, 10, y); y += 5; }
+                if (reporte.accion) { doc.text(`Acción: ${reporte.accion}`, 10, y); y += 5; }
+            }
+            
+            if (reporte.firma) {
+                y += 5;
+                doc.text(`Firma Inspector: ${reporte.firma}`, 10, y);
+            }
+            
+            doc.save(`Historial_Extintores_${reporte.fecha}_${reporte.id}.pdf`);
+        }
+        
+        // Enviar WhatsApp
+        function enviarWhatsApp() {
+            const fecha = document.getElementById('fecha').value;
+            const responsable = document.getElementById('responsable').value;
+            const resultado = document.getElementById('resultadoGlobal').value || 'PENDIENTE';
+            const hallazgo = document.getElementById('hallazgo').value;
+            
+            let mensaje = `🔥 *INSPECCIÓN MENSUAL DE EXTINTORES* 🔥%0A%0A`;
+            mensaje += `📅 Fecha: ${fecha || 'N/A'}%0A`;
+            mensaje += `👤 Responsable: ${responsable || 'N/A'}%0A`;
+            mensaje += `📊 Resultado: *${resultado}*%0A%0A`;
+            
+            const extintores = document.querySelectorAll('.extintor-card');
+            mensaje += `🧯 Extintores inspeccionados: ${extintores.length}%0A`;
+            extintores.forEach((card, i) => {
+                const id = card.querySelector('.ext-id').value;
+                const ub = card.querySelector('.ext-ubicacion').value;
+                mensaje += `   ${i+1}. ${id} - ${ub}%0A`;
+            });
+            
+            if (hallazgo) {
+                mensaje += `%0A⚠️ Hallazgo: ${hallazgo}%0A`;
+            }
+            
+            mensaje += `%0A_Generado desde el sistema de inspección_`;
+            
+            window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+        }
+        
+        // Enviar WhatsApp desde historial
+        function enviarWhatsAppDesdeHistorial(id) {
+            const r = historial.find(rep => rep.id === id);
+            if (!r) return;
+            
+            let mensaje = `🔥 *INSPECCIÓN MENSUAL DE EXTINTORES - HISTORIAL* 🔥%0A%0A`;
+            mensaje += `📅 Fecha: ${r.fecha}%0A`;
+            mensaje += `👤 Responsable: ${r.responsable}%0A`;
+            mensaje += `📊 Resultado: *${r.resultado}*%0A`;
+            mensaje += `🧯 Extintores: ${r.extintores.length}%0A%0A`;
+            
+            if (r.hallazgo) mensaje += `⚠️ Hallazgo: ${r.hallazgo}%0A`;
+            if (r.accion) mensaje += `🔧 Acción: ${r.accion}%0A`;
+            
+            window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+        }
+        
+        // Limpiar formulario
+        function limpiarFormulario() {
+            if (confirm('¿Está seguro de limpiar todo el formulario? Los datos no guardados se perderán.')) {
+                document.getElementById('inspectionForm').reset();
+                document.getElementById('fecha').valueAsDate = new Date();
+                document.querySelectorAll('.status-select').forEach(s => {
+                    s.value = '';
+                    s.className = 'status-select';
+                });
+                document.querySelectorAll('.obs-input').forEach(o => o.value = '');
+                document.getElementById('btnOperativo').classList.remove('active');
+                document.getElementById('btnNoOperativo').classList.remove('active');
+                resultadoSeleccionado = '';
+                
+                // Reset extintores a 1
+                const container = document.getElementById('extintores-container');
+                container.innerHTML = '';
+                extintorCount = 0;
+                addExtintor();
+                
+                // Reset individual table
+                const tbody = document.querySelector('#individualTable tbody');
+                tbody.innerHTML = '';
+                for (let i = 0; i < 4; i++) addIndividualRow();
+            }
+        }
+        
+        // Modal
+        function showModal(title, message) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

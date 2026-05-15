@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspección Locativa - SST</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        .nav-tab:hover { background: #e9ecef; color: #495057; }
+        .nav-tab.active {
+            background: white;
+            color: #2a5298;
+            border-bottom: 3px solid #2a5298;
+        }
+        .tab-content { display: none; padding: 30px; }
+        .tab-content.active { display: block; }
+        
+        .section-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 30px 0 20px 0;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .section-title:first-child { margin-top: 0; }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        
+        .checklist-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .checklist-table th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .checklist-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+        .checklist-table tr:hover { background: #f8f9fa; }
+        .checklist-table .numero {
+            font-weight: 700;
+            color: #2a5298;
+            width: 50px;
+        }
+        .checklist-table .elemento {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .radio-item:hover { background: #f0f0f0; }
+        .radio-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+        .radio-item.si-selected { background: #d4edda; color: #155724; }
+        .radio-item.no-selected { background: #f8d7da; color: #721c24; }
+        .radio-item.na-selected { background: #fff3cd; color: #856404; }
+        
+        .obs-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .warning-box .icon { font-size: 2em; }
+        
+        .epp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .epp-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .epp-card:hover { border-color: #667eea; }
+        .epp-card h4 {
+            color: #2a5298;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .epp-card p {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .epp-card .epp-check {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .epp-card input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+        
+        .security-check {
+            background: #e8f4f8;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+        }
+        .security-check h3 {
+            color: #0c5460;
+            margin-bottom: 15px;
+        }
+        .security-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        .security-item label {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #ccc;
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .toggle-switch input:checked + .toggle-slider { background: #28a745; }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(30px); }
+        
+        .critical-instructions {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+        }
+        .critical-instructions h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        .critical-instructions ol {
+            margin-left: 20px;
+            color: #856404;
+        }
+        .critical-instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .result-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .result-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .result-btn {
+            padding: 15px 40px;
+            border: 3px solid;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .result-btn.operativo {
+            border-color: #28a745;
+            color: #28a745;
+            background: white;
+        }
+        .result-btn.operativo:hover, .result-btn.operativo.active {
+            background: #28a745;
+            color: white;
+        }
+        .result-btn.no-operativo {
+            border-color: #dc3545;
+            color: #dc3545;
+            background: white;
+        }
+        .result-btn.no-operativo:hover, .result-btn.no-operativo.active {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-success { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; }
+        .btn-info { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #333; }
+        .btn-danger { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        .history-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .history-item:hover { border-color: #667eea; }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .history-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .status-ok { background: #d4edda; color: #155724; }
+        .status-bad { background: #f8d7da; color: #721c24; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-content h2 { margin-bottom: 20px; color: #333; }
+        .modal-content p { margin-bottom: 20px; color: #666; }
+        
+        .signature-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .signature-box {
+            text-align: center;
+        }
+        .signature-line {
+            border-bottom: 2px solid #333;
+            margin-top: 60px;
+            margin-bottom: 10px;
+        }
+        .signature-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .observaciones-section {
+            margin: 20px 0;
+        }
+        .observaciones-section textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            resize: vertical;
+        }
+        
+        .category-header {
+            background: #e9ecef;
+            font-weight: 700;
+            color: #495057;
+        }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .container { box-shadow: none; }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .signature-grid { grid-template-columns: 1fr; }
+            .result-buttons { flex-direction: column; }
+            .action-buttons { flex-direction: column; }
+            .nav-tabs { flex-direction: column; }
+            .checklist-table { font-size: 0.85em; }
+            .checklist-table th, .checklist-table td { padding: 8px; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Inspección Locativa</h1>
+            <p>Seguridad y Salud en el Trabajo - Lista de Chequeo</p>
+        </div>
+        
+        <div class="nav-tabs no-print">
+            <button class="nav-tab active" onclick="showTab('formulario')">📋 Formulario</button>
+            <button class="nav-tab" onclick="showTab('historial')">📁 Historial</button>
+        </div>
+        
+        <!-- TAB FORMULARIO -->
+        <div id="formulario" class="tab-content active">
+            <form id="inspectionForm">
+                
+                <!-- INFORMACIÓN GENERAL -->
+                <div class="section-title">📋 Información General</div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Inspección realizada por</label>
+                        <input type="text" id="inspector" placeholder="Nombre completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Dependencia</label>
+                        <input type="text" id="dependencia" placeholder="Área/Departamento" required>
+                    </div>
+                </div>
+                
+                <!-- LISTA DE CHEQUEO -->
+                <div class="section-title">✅ Lista de Chequeo</div>
+                <table class="checklist-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">No.</th>
+                            <th style="width: 45%;">Elemento a inspeccionar</th>
+                            <th style="width: 25%; text-align: center;">Cumple</th>
+                            <th style="width: 30%;">Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="checklistBody">
+                        <!-- 1. PELIGROS FÍSICOS -->
+                        <tr class="category-header">
+                            <td colspan="4">1. PELIGROS FÍSICOS</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">1.1</td>
+                            <td class="elemento">Existe buena iluminación artificial y natural.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_1_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="1_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">1.2</td>
+                            <td class="elemento">Las luminarias están en buen estado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_1_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="1_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">1.3</td>
+                            <td class="elemento">Las persianas, cortinas o protección de vidrios está en buen estado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_1_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="1_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">1.4</td>
+                            <td class="elemento">Hay buena ventilación en el área.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_1_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="1_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">1.5</td>
+                            <td class="elemento">El área está expuesta a ruido.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_1_5" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_5" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_5" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="1_5" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">1.6</td>
+                            <td class="elemento">El área está expuesta a temperaturas extremas (calor y frío).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_1_6" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_6" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_6" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="1_6" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">1.7</td>
+                            <td class="elemento">La unidad está expuesta a vibración cuerpo entero, segmentaria.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_1_7" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_7" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_1_7" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="1_7" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 2. PELIGROS QUÍMICOS -->
+                        <tr class="category-header">
+                            <td colspan="4">2. PELIGROS QUÍMICOS</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">2.1</td>
+                            <td class="elemento">La unidad está expuesta a polvos, fibras, líquidos, nieblas, gases, vapores, humos y material particulado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_2_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="2_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">2.2</td>
+                            <td class="elemento">El área cuenta con las tarjetas de emergencia impresas a color.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_2_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="2_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">2.3</td>
+                            <td class="elemento">El área cuenta con las Hojas de seguridad MSDS impresas a color.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_2_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="2_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">2.4</td>
+                            <td class="elemento">Las sustancias químicas se encuentran debidamente etiquetadas.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_2_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="2_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">2.5</td>
+                            <td class="elemento">Los Servidores saben cómo usar y cuidar sus EPP.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_2_5" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_5" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_5" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="2_5" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">2.6</td>
+                            <td class="elemento">Las sustancias químicas se encuentran debidamente almacenadas.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_2_6" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_6" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_2_6" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="2_6" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 3. PELIGROS BIOLÓGICOS -->
+                        <tr class="category-header">
+                            <td colspan="4">3. PELIGROS BIOLÓGICOS</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">3.1</td>
+                            <td class="elemento">En el área está expuesto a virus, bacterias, hongos, rickettsias, parásitos, picaduras, fluidos o excrementos.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_3_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_3_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_3_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="3_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">3.2</td>
+                            <td class="elemento">Los Servidores saben cómo usar y cuidar sus EPP.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_3_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_3_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_3_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="3_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">3.3</td>
+                            <td class="elemento">Se encuentra identificada la ruta sanitaria de disposición de residuos.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_3_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_3_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_3_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="3_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">3.4</td>
+                            <td class="elemento">El cuarto de residuos se encuentra debidamente señalizado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_3_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_3_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_3_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="3_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 4. PELIGROS BIOMECÁNICOS -->
+                        <tr class="category-header">
+                            <td colspan="4">4. PELIGROS BIOMECÁNICOS</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">4.1</td>
+                            <td class="elemento">Existen actividades que generen movimiento repetitivo.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_4_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_4_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_4_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="4_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">4.2</td>
+                            <td class="elemento">Existen actividades que generen manipulación manual de cargas.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_4_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_4_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_4_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="4_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">4.3</td>
+                            <td class="elemento">Existen actividades que generen esfuerzo.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_4_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_4_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_4_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="4_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">4.4</td>
+                            <td class="elemento">Existen actividades que generen postura (prolongada, mantenida, forzada y anti gravitacional).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_4_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_4_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_4_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="4_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 5. PELIGRO MECÁNICO -->
+                        <tr class="category-header">
+                            <td colspan="4">5. PELIGRO MECÁNICO</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">5.1</td>
+                            <td class="elemento">Equipos y herramientas en buen estado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_5_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="5_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">5.2</td>
+                            <td class="elemento">Se está expuesto a materiales proyectados, sólidos y fluidos.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_5_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="5_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">5.3</td>
+                            <td class="elemento">Archivo rodante en buen estado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_5_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="5_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">5.4</td>
+                            <td class="elemento">Muebles y estantes de la unidad se encuentran anclados y ajustados.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_5_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="5_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">5.5</td>
+                            <td class="elemento">El puesto de trabajo no tiene superficies salientes.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_5_5" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_5" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_5_5" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="5_5" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 6. PELIGROS ELÉCTRICOS -->
+                        <tr class="category-header">
+                            <td colspan="4">6. PELIGROS ELÉCTRICOS</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">6.1</td>
+                            <td class="elemento">Cables eléctricos en buen estado y debidamente entubados (sin adiciones y cintas).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_6_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="6_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">6.2</td>
+                            <td class="elemento">Los empalmes o conexiones están en buen estado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_6_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="6_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">6.3</td>
+                            <td class="elemento">Tomas e interruptores en buen estado, debidamente anclados y señalizados.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_6_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="6_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">6.4</td>
+                            <td class="elemento">Se observa cajas de breakers sin sobrecarga y señalizadas.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_6_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="6_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">6.5</td>
+                            <td class="elemento">Los tableros y cajas de breakers están libres de obstáculos.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_6_5" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_5" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_6_5" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="6_5" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 7. PELIGROS LOCÁTIVOS -->
+                        <tr class="category-header">
+                            <td colspan="4">7. PELIGROS LOCÁTIVOS</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">7.1</td>
+                            <td class="elemento">Los muros están en buen estado (sin grietas, sin humedad, pintura buen estado).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_7_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="7_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">7.2</td>
+                            <td class="elemento">Escaleras en buen estado (pasamanos, cintas antideslizantes y fotoluminiscentes).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_7_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="7_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">7.3</td>
+                            <td class="elemento">Pisos en buen estado, cuentan con antideslizantes, con acabados y sin desniveles.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_7_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="7_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">7.4</td>
+                            <td class="elemento">Ventanas, puertas en buen estado (manijas, chapas, sin vidrios fracturados).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_7_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="7_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">7.5</td>
+                            <td class="elemento">Techos en buen estado (tejas sin fisuras o rotas, sin goteras).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_7_5" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_5" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_5" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="7_5" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">7.6</td>
+                            <td class="elemento">Áreas de circulación despejadas (escaleras, zonas de tránsito en almacén, etc.).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_7_6" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_6" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_6" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="7_6" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">7.7</td>
+                            <td class="elemento">La sillas se encuentran en buen estado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_7_7" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_7" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_7" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="7_7" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">7.8</td>
+                            <td class="elemento">Las divisiones modulares, escritorio y cajones se encuentran en buenas condiciones (anclados y ajustados).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_7_8" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_8" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_7_8" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="7_8" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 8. PELIGROS POR FENÓMENOS NATURALES -->
+                        <tr class="category-header">
+                            <td colspan="4">8. PELIGROS POR FENÓMENOS NATURALES</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">8.1</td>
+                            <td class="elemento">La Entidad cuenta con plan de emergencia y contingencia.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_8_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="8_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">8.2</td>
+                            <td class="elemento">La entidad cuenta con planes operativos normalizados en caso de sismo, terremoto, vendaval, inundación, derrumbe y precipitaciones.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_8_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="8_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">8.3</td>
+                            <td class="elemento">La ruta de evacuación se encuentra señalizada y libre de obstáculos.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_8_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="8_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">8.4</td>
+                            <td class="elemento">Las salidas de emergencia y punto de encuentro se encuentran despejadas y señalizadas.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_8_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="8_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">8.5</td>
+                            <td class="elemento">La lista de teléfonos de emergencia está publicada y socializada.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_8_5" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_5" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_5" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="8_5" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">8.6</td>
+                            <td class="elemento">La brigada se encuentra identificada.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_8_6" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_6" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_8_6" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="8_6" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 9. ORDEN Y ASEO -->
+                        <tr class="category-header">
+                            <td colspan="4">9. ORDEN Y ASEO</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">9.1</td>
+                            <td class="elemento">Las áreas de la unidad se encuentran organizadas.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_9_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_9_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_9_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="9_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">9.2</td>
+                            <td class="elemento">La unidad cuenta con puntos ecológicos de disposición de residuos.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_9_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_9_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_9_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="9_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">9.3</td>
+                            <td class="elemento">El sitio inspeccionado se encuentra en buen estado de aseo y mantenimiento.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_9_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_9_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_9_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="9_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">9.4</td>
+                            <td class="elemento">El archivo de la unidad se encuentra debidamente almacenado y organizado.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_9_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_9_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_9_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="9_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 10. SANEAMIENTO BÁSICO -->
+                        <tr class="category-header">
+                            <td colspan="4">10. SANEAMIENTO BÁSICO</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">10.1</td>
+                            <td class="elemento">La Entidad cuenta con tanque de almacenamiento de agua potable.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_10_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="10_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">10.2</td>
+                            <td class="elemento">La Entidad cuenta con servicio sanitario en óptimas condiciones.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_10_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="10_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">10.3</td>
+                            <td class="elemento">Las unidades sanitarias cuentan con papel higiénico, jabón, toallas y papeleras con pedal y tapa.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_10_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="10_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">10.4</td>
+                            <td class="elemento">La Entidad tiene control de vectores y podas en áreas verdes (si aplica).</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_10_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="10_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">10.5</td>
+                            <td class="elemento">Se han realizado lavado de tanques en los últimos seis meses.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_10_5" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_5" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_10_5" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="10_5" placeholder="Observaciones..."></td>
+                        </tr>
+                        
+                        <!-- 11. PREGUNTAS Y OBSERVACIÓN DE TAREAS -->
+                        <tr class="category-header">
+                            <td colspan="4">11. PREGUNTAS Y OBSERVACIÓN DE TAREAS</td>
+                        </tr>
+                        <tr>
+                            <td class="numero">11.1</td>
+                            <td class="elemento">Los servidores, contratistas y estudiantes en práctica cumplen con las normas de seguridad de su actividad.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item El código se cortó por su longitud. Aquí tienes la **segunda parte** del HTML (continuación del JavaScript y cierre del documento):
+
+```html
+                                    <label class="radio-item"><input type="radio" name="item_11_1" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_1" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_1" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="11_1" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">11.2</td>
+                            <td class="elemento">Los servidores, contratistas y estudiantes en práctica conocen los peligros a los que están expuestos.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_11_2" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_2" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_2" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="11_2" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">11.3</td>
+                            <td class="elemento">Los servidores, contratistas y estudiantes en práctica tienen claro qué hacer en caso de incidente, accidente de trabajo y enfermedad laboral.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_11_3" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_3" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_3" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="11_3" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">11.4</td>
+                            <td class="elemento">Los servidores, contratistas y estudiantes en práctica saben qué hacer en caso de una emergencia.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_11_4" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_4" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_4" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="11_4" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">11.5</td>
+                            <td class="elemento">Los servidores, contratistas y estudiantes en práctica conocen la política de Seguridad y Salud en el Trabajo.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_11_5" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_5" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_5" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="11_5" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">11.6</td>
+                            <td class="elemento">Los servidores, contratistas y estudiantes en práctica conocen la ruta de evacuación y el punto de encuentro.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_11_6" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_6" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_6" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="11_6" placeholder="Observaciones..."></td>
+                        </tr>
+                        <tr>
+                            <td class="numero">11.7</td>
+                            <td class="elemento">Los servidores, contratistas y estudiantes en práctica conocen a los brigadistas de la Entidad.</td>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-item"><input type="radio" name="item_11_7" value="Si" onchange="updateRadio(this)"> Sí</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_7" value="No" onchange="updateRadio(this)"> No</label>
+                                    <label class="radio-item"><input type="radio" name="item_11_7" value="NA" onchange="updateRadio(this)"> N/A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" class="obs-input" data-item="11_7" placeholder="Observaciones..."></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- ADVERTENCIA DESTACADA -->
+                <div class="warning-box">
+                    <span class="icon">⚠️</span>
+                    <div>
+                        <strong>ADVERTENCIA DE SEGURIDAD</strong><br>
+                        Si se identifican condiciones críticas de riesgo eléctrico, estructural o químico, <strong>se debe suspender inmediatamente las actividades</strong> en el área y reportar al coordinador de SST.
+                    </div>
+                </div>
+                
+                <!-- EPP -->
+                <div class="section-title">🦺 Elementos de Protección Personal (EPP)</div>
+                <div class="epp-grid">
+                    <div class="epp-card">
+                        <h4>👓 Protección Ocular</h4>
+                        <p>Gafas de seguridad con resguardo lateral, pantallas faciales para trabajo con químicos.</p>
+                        <div class="epp-check">
+                            <input type="checkbox" id="epp_ocular">
+                            <label for="epp_ocular">Verificado y en buen estado</label>
+                        </div>
+                    </div>
+                    <div class="epp-card">
+                        <h4>🧤 Protección de Manos</h4>
+                        <p>Guantes de nitrilo, neopreno, cuero o anticorte según la actividad. NO guantes holgados cerca de equipos rotativos.</p>
+                        <div class="epp-check">
+                            <input type="checkbox" id="epp_manos">
+                            <label for="epp_manos">Verificado y en buen estado</label>
+                        </div>
+                    </div>
+                    <div class="epp-card">
+                        <h4>👢 Protección de Pies</h4>
+                        <p>Botas dieléctricas, punta de acero, antideslizantes. Calzado cerrado obligatorio.</p>
+                        <div class="epp-check">
+                            <input type="checkbox" id="epp_pies">
+                            <label for="epp_pies">Verificado y en buen estado</label>
+                        </div>
+                    </div>
+                    <div class="epp-card">
+                        <h4>👂 Protección Auditiva</h4>
+                        <p>Tapones, orejeras o cabinas insonorizadas en áreas con nivel de ruido >85 dB.</p>
+                        <div class="epp-check">
+                            <input type="checkbox" id="epp_auditiva">
+                            <label for="epp_auditiva">Verificado y en buen estado</label>
+                        </div>
+                    </div>
+                    <div class="epp-card">
+                        <h4>🎽 Protección Corporal</h4>
+                        <p>Overoles, delantales, arneses, chalecos reflectivos. Ropa ajustada, sin bufandas ni elementos sueltos.</p>
+                        <div class="epp-check">
+                            <input type="checkbox" id="epp_corporal">
+                            <label for="epp_corporal">Verificado y en buen estado</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- VERIFICACIÓN DE SEGURIDAD -->
+                <div class="section-title">🔧 Verificación de Seguridad</div>
+                <div class="security-check">
+                    <h3>Confirme los siguientes puntos críticos:</h3>
+                    <div class="security-item">
+                        <label>¿Se identificaron peligros que requieren acción inmediata?</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="seg_peligros">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="security-item">
+                        <label>¿Se notificó al responsable de la dependencia sobre hallazgos?</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="seg_notifico">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="security-item">
+                        <label>¿Se requiere seguimiento o reinspección?</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="seg_seguimiento">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- INSTRUCCIONES CRÍTICAS -->
+                <div class="section-title">⚠️ Instrucciones Críticas</div>
+                <div class="critical-instructions">
+                    <h3>Protocolos de seguridad esenciales:</h3>
+                    <ol>
+                        <li><strong>NO utilice</strong> guantes holgados, bufandas, mangas sueltas o joyería cerca de equipos rotativos o eléctricos.</li>
+                        <li><strong>Reporte inmediatamente</strong> cualquier condición insegura identificada durante la inspección.</li>
+                        <li><strong>Verifique</strong> que las rutas de evacuación y salidas de emergencia permanezcan despejadas en todo momento.</li>
+                        <li><strong>Documente</strong> fotográficamente los hallazgos críticos como evidencia del estado encontrado.</li>
+                    </ol>
+                </div>
+                
+                <!-- OBSERVACIONES GENERALES -->
+                <div class="section-title">📝 Observaciones Generales</div>
+                <div class="observaciones-section">
+                    <textarea id="observacionesGenerales" placeholder="Registre aquí observaciones adicionales, recomendaciones o comentarios generales sobre la inspección realizada..."></textarea>
+                </div>
+                
+                <!-- RESULTADO GLOBAL -->
+                <div class="section-title">📊 Concepto Final de la Inspección</div>
+                <div class="result-section">
+                    <p style="margin-bottom: 20px; color: #666; font-size: 1.1em;">Seleccione el estado final de la dependencia inspeccionada:</p>
+                    <div class="result-buttons">
+                        <button type="button" class="result-btn operativo" id="btnOperativo" onclick="setResultado('OPERATIVO')">
+                            ✅ OPERATIVO
+                        </button>
+                        <button type="button" class="result-btn no-operativo" id="btnNoOperativo" onclick="setResultado('NO OPERATIVO')">
+                            ❌ NO OPERATIVO
+                        </button>
+                    </div>
+                    <input type="hidden" id="resultadoGlobal" value="">
+                </div>
+                
+                <!-- FIRMAS -->
+                <div class="section-title">✍️ Firmas</div>
+                <div class="signature-section">
+                    <div class="signature-grid">
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-label">Responsable de la Inspección</div>
+                            <input type="text" id="firmaInspector" placeholder="Nombre completo" style="margin-top: 10px; text-align: center; border: none; border-bottom: 1px solid #ccc; width: 100%;">
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-label">Responsable de la Dependencia</div>
+                            <input type="text" id="firmaResponsable" placeholder="Nombre completo" style="margin-top: 10px; text-align: center; border: none; border-bottom: 1px solid #ccc; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="action-buttons no-print">
+                    <button type="button" class="btn btn-success" onclick="guardarReporte()">
+                        💾 Guardar en Historial
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="generarPDF()">
+                        📄 Descargar PDF
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="enviarWhatsApp()">
+                        💬 Enviar WhatsApp
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="limpiarFormulario()">
+                        🔄 Limpiar Formulario
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- TAB HISTORIAL -->
+        <div id="historial" class="tab-content">
+            <div class="section-title">📁 Historial de Inspecciones</div>
+            <div id="historyList">
+                <p style="text-align: center; color: #999; padding: 40px;">No hay reportes guardados en esta sesión.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Título</h2>
+            <p id="modalMessage">Mensaje</p>
+            <button class="btn btn-primary" onclick="closeModal()">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar fecha actual
+        document.getElementById('fecha').valueAsDate = new Date();
+        
+        // Estado global
+        let historial = [];
+        let resultadoSeleccionado = '';
+        
+        // Mostrar pestañas
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Actualizar radio visual
+        function updateRadio(radio) {
+            const group = radio.closest('.radio-group');
+            group.querySelectorAll('.radio-item').forEach(item => {
+                item.classList.remove('si-selected', 'no-selected', 'na-selected');
+            });
+            const parent = radio.closest('.radio-item');
+            if (radio.value === 'Si') parent.classList.add('si-selected');
+            if (radio.value === 'No') parent.classList.add('no-selected');
+            if (radio.value === 'NA') parent.classList.add('na-selected');
+        }
+        
+        // Seleccionar resultado
+        function setResultado(valor) {
+            resultadoSeleccionado = valor;
+            document.getElementById('resultadoGlobal').value = valor;
+            document.getElementById('btnOperativo').classList.toggle('active', valor === 'OPERATIVO');
+            document.getElementById('btnNoOperativo').classList.toggle('active', valor === 'NO OPERATIVO');
+        }
+        
+        // Guardar reporte
+        function guardarReporte() {
+            const fecha = document.getElementById('fecha').value;
+            const inspector = document.getElementById('inspector').value;
+            const dependencia = document.getElementById('dependencia').value;
+            
+            if (!fecha || !inspector || !dependencia) {
+                showModal('Campos Requeridos', 'Por favor complete la fecha, el inspector y la dependencia.');
+                return;
+            }
+            
+            if (!resultadoSeleccionado) {
+                showModal('Resultado Pendiente', 'Por favor seleccione el concepto final de la inspección (Operativo o No Operativo).');
+                return;
+            }
+            
+            const reporte = {
+                id: Date.now(),
+                fecha: fecha,
+                inspector: inspector,
+                dependencia: dependencia,
+                resultado: resultadoSeleccionado,
+                checklist: {},
+                epp: {},
+                seguridad: {},
+                observaciones: document.getElementById('observacionesGenerales').value,
+                firmaInspector: document.getElementById('firmaInspector').value,
+                firmaResponsable: document.getElementById('firmaResponsable').value,
+                timestamp: new Date().toLocaleString('es-ES')
+            };
+            
+            // Recopilar checklist
+            document.querySelectorAll('.radio-group').forEach(group => {
+                const radio = group.querySelector('input[type="radio"]:checked');
+                const itemName = radio ? radio.name : '';
+                if (itemName) {
+                    const obs = document.querySelector(`.obs-input[data-item="${itemName.replace('item_', '')}"]`);
+                    reporte.checklist[itemName] = {
+                        valor: radio.value,
+                        observacion: obs ? obs.value : ''
+                    };
+                }
+            });
+            
+            // Recopilar EPP
+            ['ocular', 'manos', 'pies', 'auditiva', 'corporal'].forEach(tipo => {
+                reporte.epp[tipo] = document.getElementById(`epp_${tipo}`).checked;
+            });
+            
+            // Recopilar verificación de seguridad
+            reporte.seguridad.peligros = document.getElementById('seg_peligros').checked;
+            reporte.seguridad.notifico = document.getElementById('seg_notifico').checked;
+            reporte.seguridad.seguimiento = document.getElementById('seg_seguimiento').checked;
+            
+            historial.push(reporte);
+            actualizarHistorial();
+            showModal('✅ Reporte Guardado', `La inspección de ${dependencia} del ${fecha} ha sido almacenada en el historial.`);
+        }
+        
+        // Actualizar vista de historial
+        function actualizarHistorial() {
+            const container = document.getElementById('historyList');
+            if (historial.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No hay reportes guardados en esta sesión.</p>';
+                return;
+            }
+            
+            container.innerHTML = historial.map(r => `
+                <div class="history-item">
+                    <div class="history-header">
+                        <div>
+                            <strong>📅 ${r.fecha}</strong> | 👤 ${r.inspector}
+                            <br><small style="color: #999;">${r.dependencia} | Guardado: ${r.timestamp}</small>
+                        </div>
+                        <span class="history-status ${r.resultado === 'OPERATIVO' ? 'status-ok' : 'status-bad'}">
+                            ${r.resultado === 'OPERATIVO' ? '✅ OPERATIVO' : '❌ NO OPERATIVO'}
+                        </span>
+                    </div>
+                    <p><strong>Dependencia:</strong> ${r.dependencia}</p>
+                    ${r.observaciones ? `<p><strong>Observaciones:</strong> ${r.observaciones}</p>` : ''}
+                    <div class="action-buttons" style="margin-top: 15px; justify-content: flex-start;">
+                        <button class="btn btn-info" onclick="descargarPDFDesdeHistorial(${r.id})" style="padding: 8px 15px; font-size: 0.9em;">
+                            📄 PDF
+                        </button>
+                        <button class="btn btn-warning" onclick="enviarWhatsAppDesdeHistorial(${r.id})" style="padding: 8px 15px; font-size: 0.9em;">
+                            💬 WhatsApp
+                        </button>
+                        <button class="btn btn-danger" onclick="borrarReporte(${r.id})" style="padding: 8px 15px; font-size: 0.9em;">
+                            🗑️ Borrar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Borrar reporte
+        function borrarReporte(id) {
+            if (confirm('¿Está seguro de eliminar este reporte del historial?')) {
+                historial = historial.filter(r => r.id !== id);
+                actualizarHistorial();
+            }
+        }
+        
+        // Generar PDF
+        async function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Encabezado
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 30, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text('INSPECCIÓN LOCATIVE - SST', 105, 15, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text('Lista de Chequeo de Seguridad y Salud en el Trabajo', 105, 22, { align: 'center' });
+            
+            let y = 40;
+            
+            // Info General
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('INFORMACIÓN GENERAL', 10, y);
+            doc.setFont(undefined, 'normal');
+            y += 7;
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${document.getElementById('fecha').value || 'No especificada'}`, 10, y);
+            y += 6;
+            doc.text(`Inspector: ${document.getElementById('inspector').value || 'No especificado'}`, 10, y);
+            y += 6;
+            doc.text(`Dependencia: ${document.getElementById('dependencia').value || 'No especificada'}`, 10, y);
+            y += 12;
+            
+            // Checklist resumido
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('RESULTADOS DEL CHECKLIST', 10, y);
+            y += 7;
+            
+            const categorias = {
+                '1': 'PELIGROS FÍSICOS',
+                '2': 'PELIGROS QUÍMICOS',
+                '3': 'PELIGROS BIOLÓGICOS',
+                '4': 'PELIGROS BIOMECÁNICOS',
+                '5': 'PELIGRO MECÁNICO',
+                '6': 'PELIGROS ELÉCTRICOS',
+                '7': 'PELIGROS LOCÁTIVOS',
+                '8': 'FENÓMENOS NATURALES',
+                '9': 'ORDEN Y ASEO',
+                '10': 'SANEAMIENTO BÁSICO',
+                '11': 'OBSERVACIÓN DE TAREAS'
+            };
+            
+            let siCount = 0, noCount = 0, naCount = 0, totalCount = 0;
+            
+            document.querySelectorAll('.radio-group').forEach(group => {
+                const radio = group.querySelector('input[type="radio"]:checked');
+                if (radio) {
+                    totalCount++;
+                    if (radio.value === 'Si') siCount++;
+                    if (radio.value === 'No') noCount++;
+                    if (radio.value === 'NA') naCount++;
+                }
+            });
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Total ítems evaluados: ${totalCount}`, 10, y);
+            y += 6;
+            doc.setTextColor(40, 167, 69);
+            doc.text(`✓ Cumple (Sí): ${siCount}`, 10, y);
+            y += 6;
+            doc.setTextColor(220, 53, 69);
+            doc.text(`✗ No Cumple: ${noCount}`, 10, y);
+            y += 6;
+            doc.setTextColor(255, 193, 7);
+            doc.text(`○ No Aplica: ${naCount}`, 10, y);
+            y += 6;
+            doc.setTextColor(0, 0, 0);
+            doc.text(`○ Sin responder: ${47 - totalCount}`, 10, y);
+            y += 12;
+            
+            // Observaciones
+            const obs = document.getElementById('observacionesGenerales').value;
+            if (obs) {
+                doc.setFont(undefined, 'bold');
+                doc.text('OBSERVACIONES:', 10, y);
+                y += 6;
+                doc.setFont(undefined, 'normal');
+                const splitObs = doc.splitTextToSize(obs, 190);
+                doc.text(splitObs, 10, y);
+                y += splitObs.length * 6 + 6;
+            }
+            
+            // Resultado
+            if (y > 250) { doc.addPage(); y = 20; }
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            const resultado = document.getElementById('resultadoGlobal').value || 'PENDIENTE';
+            if (resultado === 'OPERATIVO') {
+                doc.setTextColor(40, 167, 69);
+                doc.text('RESULTADO: ✅ OPERATIVO', 105, y, { align: 'center' });
+            } else if (resultado === 'NO OPERATIVO') {
+                doc.setTextColor(220, 53, 69);
+                doc.text('RESULTADO: ❌ NO OPERATIVO', 105, y, { align: 'center' });
+            } else {
+                doc.setTextColor(0, 0, 0);
+                doc.text('RESULTADO: PENDIENTE', 105, y, { align: 'center' });
+            }
+            y += 15;
+            
+            // Firmas
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const firmaInsp = document.getElementById('firmaInspector').value;
+            const firmaResp = document.getElementById('firmaResponsable').value;
+            
+            if (firmaInsp) {
+                doc.line(30, y, 90, y);
+                doc.text(`Inspector: ${firmaInsp}`, 30, y + 5);
+            }
+            if (firmaResp) {
+                doc.line(120, y, 180, y);
+                doc.text(`Responsable: ${firmaResp}`, 120, y + 5);
+            }
+            
+            // Pie de página
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            doc.text(`Generado el ${new Date().toLocaleString('es-ES')} - Inspección Locativa SST`, 105, 290, { align: 'center' });
+            
+            doc.save(`Inspeccion_Locativa_${document.getElementById('fecha').value || 'sin_fecha'}.pdf`);
+        }
+        
+        // Descargar PDF desde historial
+        function descargarPDFDesdeHistorial(id) {
+            const reporte = historial.find(r => r.id === id);
+            if (!reporte) return;
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 25, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.text('INSPECCIÓN LOCATIVE - HISTORIAL', 105, 12, { align: 'center' });
+            doc.setFontSize(9);
+            doc.text(`Reporte del ${reporte.fecha} - ${reporte.timestamp}`, 105, 20, { align: 'center' });
+            
+            let y = 35;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('INFORMACIÓN GENERAL', 10, y); y += 7;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${reporte.fecha}`, 10, y); y += 6;
+            doc.text(`Inspector: ${reporte.inspector}`, 10, y); y += 6;
+            doc.text(`Dependencia: ${reporte.dependencia}`, 10, y); y += 6;
+            doc.text(`Resultado: ${reporte.resultado}`, 10, y); y += 10;
+            
+            if (reporte.observaciones) {
+                doc.setFont(undefined, 'bold');
+                doc.text('OBSERVACIONES:', 10, y); y += 6;
+                doc.setFont(undefined, 'normal');
+                const splitObs = doc.splitTextToSize(reporte.observaciones, 190);
+                doc.text(splitObs, 10, y);
+                y += splitObs.length * 6 + 6;
+            }
+            
+            if (reporte.firmaInspector || reporte.firmaResponsable) {
+                y += 5;
+                if (reporte.firmaInspector) doc.text(`Inspector: ${reporte.firmaInspector}`, 10, y);
+                if (reporte.firmaResponsable) doc.text(`Responsable: ${reporte.firmaResponsable}`, 110, y);
+            }
+            
+            doc.save(`Historial_Locativa_${reporte.fecha}_${reporte.id}.pdf`);
+        }
+        
+        // Enviar WhatsApp
+        function enviarWhatsApp() {
+            const fecha = document.getElementById('fecha').value;
+            const inspector = document.getElementById('inspector').value;
+            const dependencia = document.getElementById('dependencia').value;
+            const resultado = document.getElementById('resultadoGlobal').value || 'PENDIENTE';
+            
+            let mensaje = `🏢 *INSPECCIÓN LOCATIVE - SST* 🏢%0A%0A`;
+            mensaje += `📅 Fecha: ${fecha || 'N/A'}%0A`;
+            mensaje += `👤 Inspector: ${inspector || 'N/A'}%0A`;
+            mensaje += `🏛️ Dependencia: ${dependencia || 'N/A'}%0A`;
+            mensaje += `📊 Resultado: *${resultado}*%0A%0A`;
+            
+            let siCount = 0, noCount = 0;
+            document.querySelectorAll('.radio-group').forEach(group => {
+                const radio = group.querySelector('input[type="radio"]:checked');
+                if (radio) {
+                    if (radio.value === 'Si') siCount++;
+                    if (radio.value === 'No') noCount++;
+                }
+            });
+            
+            mensaje += `📋 Checklist:%0A`;
+            mensaje += `   ✓ Cumple: ${siCount}%0A`;
+            mensaje += `   ✗ No cumple: ${noCount}%0A%0A`;
+            
+            const obs = document.getElementById('observacionesGenerales').value;
+            if (obs) mensaje += `📝 Observaciones: ${obs}%0A%0A`;
+            
+            mensaje += `_Generado desde el sistema de inspección locativa_`;
+            
+            window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+        }
+        
+        // Enviar WhatsApp desde historial
+        function enviarWhatsAppDesdeHistorial(id) {
+            const r = historial.find(rep => rep.id === id);
+            if (!r) return;
+            
+            let mensaje = `🏢 *INSPECCIÓN LOCATIVE - HISTORIAL* 🏢%0A%0A`;
+            mensaje += `📅 Fecha: ${r.fecha}%0A`;
+            mensaje += `👤 Inspector: ${r.inspector}%0A`;
+            mensaje += `🏛️ Dependencia: ${r.dependencia}%0A`;
+            mensaje += `📊 Resultado: *${r.resultado}*%0A%0A`;
+            
+            if (r.observaciones) mensaje += `📝 Observaciones: ${r.observaciones}%0A%0A`;
+            
+            window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+        }
+        
+        // Limpiar formulario
+        function limpiarFormulario() {
+            if (confirm('¿Está seguro de limpiar todo el formulario? Los datos no guardados se perderán.')) {
+                document.getElementById('inspectionForm').reset();
+                document.getElementById('fecha').valueAsDate = new Date();
+                document.querySelectorAll('.radio-item').forEach(item => {
+                    item.classList.remove('si-selected', 'no-selected', 'na-selected');
+                });
+                document.querySelectorAll('.obs-input').forEach(o => o.value = '');
+                document.getElementById('btnOperativo').classList.remove('active');
+                document.getElementById('btnNoOperativo').classList.remove('active');
+                resultadoSeleccionado = '';
+            }
+        }
+        
+        // Modal
+        function showModal(title, message) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

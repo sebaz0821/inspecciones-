@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspección Preoperacional - Equipo de Soldadura</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .form-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-body {
+            padding: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+        }
+
+        .instructions strong {
+            color: #856404;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .instructions li {
+            margin-bottom: 4px;
+            color: #856404;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover {
+            background: #f0f0f0;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .radio-option.bueno { color: #28a745; }
+        .radio-option.regular { color: #ffc107; }
+        .radio-option.malo { color: #dc3545; }
+        .radio-option.na { color: #6c757d; }
+
+        .radio-option.si { color: #28a745; }
+        .radio-option.no { color: #dc3545; }
+
+        .obs-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .novedades-table input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .concepto-final {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .concepto-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .concepto-option:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .concepto-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        .concepto-option.apto {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .concepto-option.no-apto {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .concepto-option.mantenimiento {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .observaciones-finales {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .firmas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .firma-box {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .firma-box:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .firma-box canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .recomendaciones {
+            background: #e8f4f8;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .recomendaciones h3 {
+            color: #0c5460;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .recomendaciones ol {
+            margin-left: 20px;
+        }
+
+        .recomendaciones li {
+            margin-bottom: 8px;
+            color: #0c5460;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 30px;
+            background: #f8f9fa;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(235, 51, 73, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .historial-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .reporte-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+
+        .reporte-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .reporte-title {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .reporte-date {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .reporte-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-apto {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-no-apto {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-mantenimiento {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .whatsapp-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .whatsapp-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .whatsapp-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .actions, .btn, .historial-modal, .whatsapp-modal {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-content {
+                padding: 15px;
+            }
+            .radio-group {
+                flex-wrap: wrap;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 FORMATO DE INSPECCIÓN PREOPERACIONAL</h1>
+            <p>Equipo de Soldadura - Control de Seguridad Industrial</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <form id="inspeccionForm">
+            <!-- SECCIÓN 1: INFORMACIÓN GENERAL -->
+            <div class="section">
+                <div class="section-header">
+                    <span>📋</span> 1. INFORMACIÓN GENERAL
+                </div>
+                <div class="section-body">
+                    <div class="info-grid">
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" id="fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Soldador</label>
+                            <input type="text" id="nombreSoldador" placeholder="Nombre completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cargo</label>
+                            <input type="text" id="cargo" value="Soldador" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Lugar de Trabajo</label>
+                            <input type="text" id="lugarTrabajo" placeholder="Ubicación" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: INSPECCIÓN PREOPERACIONAL -->
+            <div class="section">
+                <div class="section-header">
+                    <span>✅</span> 2. INSPECCIÓN PREOPERACIONAL
+                </div>
+                <div class="section-body">
+                    <div class="instructions">
+                        <strong>Instrucciones:</strong>
+                        <ul>
+                            <li><strong>B:</strong> Bueno</li>
+                            <li><strong>R:</strong> Regular</li>
+                            <li><strong>M:</strong> Malo</li>
+                            <li><strong>NA:</strong> No Aplica</li>
+                        </ul>
+                        <p style="margin-top:10px; color: #dc3545; font-weight: 600;">
+                            ⚠️ En caso de encontrar condiciones inseguras o defectos en el equipo, NO iniciar labores hasta corregir la novedad.
+                        </p>
+                    </div>
+
+                    <!-- A. ESTADO GENERAL DEL EQUIPO -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 16px;">A. ESTADO GENERAL DEL EQUIPO</h3>
+                        <table id="tablaEstadoGeneral">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%;">ÍTEM A VERIFICAR</th>
+                                    <th>B</th>
+                                    <th>R</th>
+                                    <th>M</th>
+                                    <th>NA</th>
+                                    <th style="width: 30%;">OBSERVACIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Items generados por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- B. CABLES Y ACCESORIOS -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 16px;">B. CABLES Y ACCESORIOS</h3>
+                        <table id="tablaCables">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%;">ÍTEM A VERIFICAR</th>
+                                    <th>B</th>
+                                    <th>R</th>
+                                    <th>M</th>
+                                    <th>NA</th>
+                                    <th style="width: 30%;">OBSERVACIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Items generados por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- C. SEGURIDAD INDUSTRIAL -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 16px;">C. SEGURIDAD INDUSTRIAL</h3>
+                        <table id="tablaSeguridad">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%;">ÍTEM A VERIFICAR</th>
+                                    <th>B</th>
+                                    <th>R</th>
+                                    <th>M</th>
+                                    <th>NA</th>
+                                    <th style="width: 30%;">OBSERVACIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Items generados por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- D. ELEMENTOS DE PROTECCIÓN PERSONAL (EPP) -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 16px;">D. ELEMENTOS DE PROTECCIÓN PERSONAL (EPP)</h3>
+                        <table id="tablaEPP">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%;">EPP</th>
+                                    <th>SI</th>
+                                    <th>NO</th>
+                                    <th style="width: 50%;">OBSERVACIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Items generados por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: NOVEDADES Y ACCIONES CORRECTIVAS -->
+            <div class="section">
+                <div class="section-header">
+                    <span>⚠️</span> 3. NOVEDADES Y ACCIONES CORRECTIVAS
+                </div>
+                <div class="section-body">
+                    <table class="novedades-table">
+                        <thead>
+                            <tr>
+                                <th>NOVEDAD ENCONTRADA</th>
+                                <th>ACCIÓN CORRECTIVA</th>
+                                <th>RESPONSABLE</th>
+                                <th>FECHA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaNovedades">
+                            <tr>
+                                <td><input type="text" placeholder="Describa la novedad"></td>
+                                <td><input type="text" placeholder="Acción a tomar"></td>
+                                <td><input type="text" placeholder="Responsable"></td>
+                                <td><input type="date"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" placeholder="Describa la novedad"></td>
+                                <td><input type="text" placeholder="Acción a tomar"></td>
+                                <td><input type="text" placeholder="Responsable"></td>
+                                <td><input type="date"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" placeholder="Describa la novedad"></td>
+                                <td><input type="text" placeholder="Acción a tomar"></td>
+                                <td><input type="text" placeholder="Responsable"></td>
+                                <td><input type="date"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" placeholder="Describa la novedad"></td>
+                                <td><input type="text" placeholder="Acción a tomar"></td>
+                                <td><input type="text" placeholder="Responsable"></td>
+                                <td><input type="date"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 4: CONCEPTO FINAL -->
+            <div class="section">
+                <div class="section-header">
+                    <span>📊</span> 4. CONCEPTO FINAL
+                </div>
+                <div class="section-body">
+                    <div class="concepto-final">
+                        <label class="concepto-option apto">
+                            <input type="radio" name="conceptoFinal" value="apto" required>
+                            <span>✅ Equipo apto para operar</span>
+                        </label>
+                        <label class="concepto-option no-apto">
+                            <input type="radio" name="conceptoFinal" value="no-apto">
+                            <span>❌ Equipo NO apto para operar</span>
+                        </label>
+                        <label class="concepto-option mantenimiento">
+                            <input type="radio" name="conceptoFinal" value="mantenimiento">
+                            <span>🔧 Requiere mantenimiento</span>
+                        </label>
+                    </div>
+                    <textarea class="observaciones-finales" id="observacionesFinales" placeholder="Observaciones finales..."></textarea>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 5: FIRMAS -->
+            <div class="section">
+                <div class="section-header">
+                    <span>✍️</span> 5. FIRMAS
+                </div>
+                <div class="section-body">
+                    <div class="firmas-grid">
+                        <div>
+                            <label style="font-weight: 600; margin-bottom: 8px; display: block;">Soldador</label>
+                            <input type="text" id="nombreFirma" placeholder="Nombre" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px;">
+                            <div class="firma-box" id="firmaBox1" onclick="iniciarFirma('canvas1')">
+                                <canvas id="canvas1" width="300" height="100"></canvas>
+                                <p style="color: #999; margin-top: 10px;">Click para firmar</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; margin-bottom: 8px; display: block;">Supervisor</label>
+                            <input type="text" id="nombreSupervisor" placeholder="Nombre del supervisor" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px;">
+                            <div class="firma-box" id="firmaBox2" onclick="iniciarFirma('canvas2')">
+                                <canvas id="canvas2" width="300" height="100"></canvas>
+                                <p style="color: #999; margin-top: 10px;">Click para firmar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECOMENDACIONES -->
+            <div class="section">
+                <div class="section-header">
+                    <span>💡</span> RECOMENDACIONES DE SEGURIDAD
+                </div>
+                <div class="section-body">
+                    <div class="recomendaciones">
+                        <h3>Recomendaciones Importantes</h3>
+                        <ol>
+                            <li>Verificar el estado de cables y conexiones antes de iniciar labores.</li>
+                            <li>Mantener materiales inflamables alejados del área de trabajo.</li>
+                            <li>Utilizar siempre los elementos de protección personal.</li>
+                            <li>No trabajar en ambientes húmedos o sin ventilación.</li>
+                            <li>Inspeccionar cilindros y reguladores antes de su uso.</li>
+                            <li>Mantener disponible un extintor cerca del área de soldadura.</li>
+                            <li>Suspender la operación si se detectan fugas eléctricas o de gas.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- ACCIONES -->
+        <div class="actions">
+            <button class="btn btn-primary" onclick="guardarReporte()">
+                💾 Guardar Reporte
+            </button>
+            <button class="btn btn-success" onclick="generarPDF()">
+                📄 Descargar PDF
+            </button>
+            <button class="btn btn-warning" onclick="enviarWhatsApp()">
+                💬 Enviar WhatsApp
+            </button>
+            <button class="btn btn-info" onclick="verHistorial()">
+                📁 Ver Historial
+            </button>
+            <button class="btn btn-danger" onclick="limpiarFormulario()">
+                🗑️ Limpiar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIAL -->
+    <div class="historial-modal" id="historialModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📁 Historial de Inspecciones</h2>
+                <button class="close-modal" onclick="cerrarHistorial()">×</button>
+            </div>
+            <div class="modal-body" id="historialBody">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL WHATSAPP -->
+    <div class="whatsapp-modal" id="whatsappModal">
+        <div class="whatsapp-content">
+            <h3 style="margin-bottom: 15px;">📱 Enviar por WhatsApp</h3>
+            <label>Número de teléfono (con código de país):</label>
+            <input type="tel" class="whatsapp-input" id="whatsappNumero" placeholder="Ej: 573001234567">
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-success" onclick="confirmarWhatsApp()">Enviar</button>
+                <button class="btn btn-danger" onclick="cerrarWhatsApp()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de los ítems de inspección
+        const itemsEstadoGeneral = [
+            "Estado general del equipo de soldadura",
+            "Limpieza del equipo",
+            "Cable de alimentación eléctrica",
+            "Estado del enchufe",
+            "Conexiones eléctricas seguras",
+            "Funcionamiento del interruptor principal",
+            "Estado de los bornes y terminales",
+            "Ausencia de sobrecalentamiento",
+            "Ventilación del equipo",
+            "Etiquetas y señales legibles"
+        ];
+
+        const itemsCables = [
+            "Cable portaelectrodo",
+            "Cable de masa",
+            "Estado del portaelectrodo",
+            "Pinza de masa en buen estado",
+            "Aislamiento de cables",
+            "Conectores ajustados",
+            "Mangueras sin fugas (si aplica)",
+            "Reguladores de presión funcionales",
+            "Estado de cilindros de gases",
+            "Carro porta cilindros en buen estado"
+        ];
+
+        const itemsSeguridad = [
+            "Extintor cercano y vigente",
+            "Área libre de materiales inflamables",
+            "Señalización del área",
+            "Pantallas o biombos de protección",
+            "Buena ventilación del área",
+            "Orden y aseo del área",
+            "Iluminación adecuada",
+            "Conexión a tierra adecuada",
+            "Ausencia de humedad en el área",
+            "Permiso de trabajo diligenciado (si aplica)"
+        ];
+
+        const itemsEPP = [
+            "Careta de soldar",
+            "Lentes de seguridad",
+            "Guantes para soldadura",
+            "Delantal de cuero",
+            "Mangas de protección",
+            "Botas de seguridad",
+            "Protección respiratoria",
+            "Protección auditiva",
+            "Casco de seguridad",
+            "Ropa de trabajo adecuada"
+        ];
+
+        // Generar tablas dinámicas
+        function generarTablaBRMA(items, tablaId) {
+            const tbody = document.querySelector(`#${tablaId} tbody`);
+            items.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item}</td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option bueno">
+                                <input type="radio" name="${tablaId}_${index}" value="B" required>
+                                <span>B</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option regular">
+                                <input type="radio" name="${tablaId}_${index}" value="R">
+                                <span>R</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option malo">
+                                <input type="radio" name="${tablaId}_${index}" value="M">
+                                <span>M</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option na">
+                                <input type="radio" name="${tablaId}_${index}" value="NA">
+                                <span>NA</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td><input type="text" class="obs-input" id="obs_${tablaId}_${index}" placeholder="Observaciones"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function generarTablaEPP(items, tablaId) {
+            const tbody = document.querySelector(`#${tablaId} tbody`);
+            items.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item}</td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option si">
+                                <input type="radio" name="${tablaId}_${index}" value="SI" required>
+                                <span>SI</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option no">
+                                <input type="radio" name="${tablaId}_${index}" value="NO">
+                                <span>NO</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td><input type="text" class="obs-input" id="obs_${tablaId}_${index}" placeholder="Observaciones"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Inicializar tablas
+        generarTablaBRMA(itemsEstadoGeneral, 'tablaEstadoGeneral');
+        generarTablaBRMA(itemsCables, 'tablaCables');
+        generarTablaBRMA(itemsSeguridad, 'tablaSeguridad');
+        generarTablaEPP(itemsEPP, 'tablaEPP');
+
+        // Establecer fecha actual
+        document.getElementById('fecha').valueAsDate = new Date();
+
+        // Sistema de firmas
+        let canvasActivo = null;
+        let dibujando = false;
+
+        function iniciarFirma(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvasActivo = { canvas, ctx };
+            
+            // Limpiar mensaje
+            canvas.parentElement.querySelector('p').style.display = 'none';
+            
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            
+            canvas.addEventListener('mousedown', empezarDibujo);
+            canvas.addEventListener('mousemove', dibujar);
+            canvas.addEventListener('mouseup', terminarDibujo);
+            canvas.addEventListener('mouseout', terminarDibujo);
+            
+            // Touch events
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                empezarDibujo({ offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top });
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                dibujar({ offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top });
+            });
+            canvas.addEventListener('touchend', terminarDibujo);
+        }
+
+        function empezarDibujo(e) {
+            dibujando = true;
+            canvasActivo.ctx.beginPath();
+            canvasActivo.ctx.moveTo(e.offsetX, e.offsetY);
+        }
+
+        function dibujar(e) {
+            if (!dibujando) return;
+            canvasActivo.ctx.lineTo(e.offsetX, e.offsetY);
+            canvasActivo.ctx.stroke();
+        }
+
+        function terminarDibujo() {
+            dibujando = false;
+        }
+
+        // Recolectar datos del formulario
+        function recolectarDatos() {
+            const datos = {
+                id: Date.now(),
+                fecha: document.getElementById('fecha').value,
+                nombreSoldador: document.getElementById('nombreSoldador').value,
+                cargo: document.getElementById('cargo').value,
+                lugarTrabajo: document.getElementById('lugarTrabajo').value,
+                estadoGeneral: [],
+                cables: [],
+                seguridad: [],
+                epp: [],
+                novedades: [],
+                conceptoFinal: document.querySelector('input[name="conceptoFinal"]:checked')?.value || '',
+                observacionesFinales: document.getElementById('observacionesFinales').value,
+                nombreFirma: document.getElementById('nombreFirma').value,
+                nombreSupervisor: document.getElementById('nombreSupervisor').value,
+                fechaCreacion: new Date().toLocaleString()
+            };
+
+            // Recolectar Estado General
+            itemsEstadoGeneral.forEach((item, i) => {
+                const valor = document.querySelector(`input[name="tablaEstadoGeneral_${i}"]:checked`)?.value || '';
+                const obs = document.getElementById(`obs_tablaEstadoGeneral_${i}`).value;
+                datos.estadoGeneral.push({ item, valor, observaciones: obs });
+            });
+
+            // Recolectar Cables
+            itemsCables.forEach((item, i) => {
+                const valor = document.querySelector(`input[name="tablaCables_${i}"]:checked`)?.value || '';
+                const obs = document.getElementById(`obs_tablaCables_${i}`).value;
+                datos.cables.push({ item, valor, observaciones: obs });
+            });
+
+            // Recolectar Seguridad
+            itemsSeguridad.forEach((item, i) => {
+                const valor = document.querySelector(`input[name="tablaSeguridad_${i}"]:checked`)?.value || '';
+                const obs = document.getElementById(`obs_tablaSeguridad_${i}`).value;
+                datos.seguridad.push({ item, valor, observaciones: obs });
+            });
+
+            // Recolectar EPP
+            itemsEPP.forEach((item, i) => {
+                const valor = document.querySelector(`input[name="tablaEPP_${i}"]:checked`)?.value || '';
+                const obs = document.getElementById(`obs_tablaEPP_${i}`).value;
+                datos.epp.push({ item, valor, observaciones: obs });
+            });
+
+            // Recolectar Novedades
+            const filasNovedades = document.querySelectorAll('#tablaNovedades tr');
+            filasNovedades.forEach(fila => {
+                const inputs = fila.querySelectorAll('input');
+                if (inputs[0].value) {
+                    datos.novedades.push({
+                        novedad: inputs[0].value,
+                        accion: inputs[1].value,
+                        responsable: inputs[2].value,
+                        fecha: inputs[3].value
+                    });
+                }
+            });
+
+            return datos;
+        }
+
+        // Guardar en historial (localStorage)
+        function guardarReporte() {
+            if (!validarFormulario()) return;
+
+            const datos = recolectarDatos();
+            let historial = JSON.parse(localStorage.getItem('inspeccionesSoldadura') || '[]');
+            historial.push(datos);
+            localStorage.setItem('inspeccionesSoldadura', JSON.stringify(historial));
+            
+            mostrarAlerta('✅ Reporte guardado exitosamente en el historial', 'success');
+        }
+
+        function validarFormulario() {
+            const fecha = document.getElementById('fecha').value;
+            const nombre = document.getElementById('nombreSoldador').value;
+            const lugar = document.getElementById('lugarTrabajo').value;
+            const concepto = document.querySelector('input[name="conceptoFinal"]:checked');
+
+            if (!fecha || !nombre || !lugar) {
+                mostrarAlerta('❌ Complete la información general (Fecha, Nombre, Lugar)', 'danger');
+                return false;
+            }
+
+            if (!concepto) {
+                mostrarAlerta('❌ Seleccione el concepto final', 'danger');
+                return false;
+            }
+
+            return true;
+        }
+
+        function mostrarAlerta(mensaje, tipo) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `<div class="alert alert-${tipo}" style="display: block;">${mensaje}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Generar PDF
+        async function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const datos = recolectarDatos();
+
+            // Encabezado
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text('FORMATO DE INSPECCIÓN PREOPERACIONAL', 105, 20, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text('Equipo de Soldadura', 105, 30, { align: 'center' });
+
+            let y = 50;
+
+            // Info General
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('1. INFORMACIÓN GENERAL', 10, y);
+            y += 10;
+            
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${datos.fecha}`, 10, y);
+            doc.text(`Soldador: ${datos.nombreSoldador}`, 70, y);
+            y += 7;
+            doc.text(`Cargo: ${datos.cargo}`, 10, y);
+            doc.text(`Lugar: ${datos.lugarTrabajo}`, 70, y);
+            y += 15;
+
+            // Función para crear tabla de inspección
+            function crearTablaInspeccion(titulo, items, y) {
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text(titulo, 10, y);
+                y += 8;
+
+                const headers = [['ÍTEM', 'B', 'R', 'M', 'NA', 'OBSERVACIONES']];
+                const data = items.map(i => [i.item, i.valor === 'B' ? '✓' : '', i.valor === 'R' ? '✓' : '', i.valor === 'M' ? '✓' : '', i.valor === 'NA' ? '✓' : '', i.observaciones || '']);
+
+                doc.autoTable({
+                    head: headers,
+                    body: data,
+                    startY: y,
+                    theme: 'grid',
+                    styles: { fontSize: 8, cellPadding: 2 },
+                    headStyles: { fillColor: [44, 62, 80], textColor: 255 },
+                    columnStyles: {
+                        0: { cellWidth: 70 },
+                        1: { cellWidth: 10, halign: 'center' },
+                        2: { cellWidth: 10, halign: 'center' },
+                        3: { cellWidth: 10, halign: 'center' },
+                        4: { cellWidth: 12, halign: 'center' },
+                        5: { cellWidth: 'auto' }
+                    }
+                });
+
+                return doc.lastAutoTable.finalY + 10;
+            }
+
+            y = crearTablaInspeccion('A. ESTADO GENERAL DEL EQUIPO', datos.estadoGeneral, y);
+            y = crearTablaInspeccion('B. CABLES Y ACCESORIOS', datos.cables, y);
+            y = crearTablaInspeccion('C. SEGURIDAD INDUSTRIAL', datos.seguridad, y);
+
+            // EPP
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('D. ELEMENTOS DE PROTECCIÓN PERSONAL (EPP)', 10, y);
+            y += 8;
+
+            const headersEPP = [['EPP', 'SI', 'NO', 'OBSERVACIONES']];
+            const dataEPP = datos.epp.map(i => [i.item, i.valor === 'SI' ? '✓' : '', i.valor === 'NO' ? '✓' : '', i.observaciones || '']);
+
+            doc.autoTable({
+                head: headersEPP,
+                body: dataEPP,
+                startY: y,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2 },
+                headStyles: { fillColor: [44, 62, 80], textColor: 255 }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+
+            // Nueva página si es necesario
+            if (y > 250) {
+                doc.addPage();
+                y = 20;
+            }
+
+            // Novedades
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('3. NOVEDADES Y ACCIONES CORRECTIVAS', 10, y);
+            y += 8;
+
+            const headersNovedades = [['NOVEDAD', 'ACCIÓN CORRECTIVA', 'RESPONSABLE', 'FECHA']];
+            const dataNovedades = datos.novedades.length > 0 ? 
+                datos.novedades.map(n => [n.novedad, n.accion, n.responsable, n.fecha]) :
+                [['', '', '', '']];
+
+            doc.autoTable({
+                head: headersNovedades,
+                body: dataNovedades,
+                startY: y,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2 },
+                headStyles: { fillColor: [44, 62, 80], textColor: 255 }
+            });
+            y = doc.lastAutoTable.finalY + 15;
+
+            // Concepto Final
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('4. CONCEPTO FINAL', 10, y);
+            y += 10;
+            
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(11);
+            const conceptos = {
+                'apto': '✅ Equipo apto para operar',
+                'no-apto': '❌ Equipo NO apto para operar',
+                'mantenimiento': '🔧 Requiere mantenimiento'
+            };
+            doc.text(conceptos[datos.conceptoFinal] || 'No seleccionado', 10, y);
+            y += 10;
+
+            if (datos.observacionesFinales) {
+                doc.setFontSize(10);
+                doc.text('Observaciones:', 10, y);
+                y += 6;
+                doc.setFontSize(9);
+                const splitObs = doc.splitTextToSize(datos.observacionesFinales, 190);
+                doc.text(splitObs, 10, y);
+                y += splitObs.length * 5 + 10;
+            }
+
+            // Firmas
+            if (y > 230) {
+                doc.addPage();
+                y = 20;
+            }
+
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('5. FIRMAS', 10, y);
+            y += 15;
+
+            // Líneas de firma
+            doc.setDrawColor(0);
+            doc.line(10, y, 90, y);
+            doc.line(110, y, 190, y);
+            y += 5;
+            doc.setFontSize(10);
+            doc.text(`Soldador: ${datos.nombreFirma || ''}`, 10, y);
+            doc.text(`Supervisor: ${datos.nombreSupervisor || ''}`, 110, y);
+
+            // Guardar
+            doc.save(`Inspeccion_Soldadura_${datos.fecha}_${datos.nombreSoldador}.pdf`);
+            mostrarAlerta('📄 PDF generado exitosamente', 'success');
+        }
+
+        // WhatsApp
+        function enviarWhatsApp() {
+            document.getElementById('whatsappModal').style.display = 'flex';
+        }
+
+        function cerrarWhatsApp() {
+            document.getElementById('whatsappModal').style.display = 'none';
+        }
+
+        function confirmarWhatsApp() {
+            const numero = document.getElementById('whatsappNumero').value.replace(/\D/g, '');
+            if (!numero) {
+                mostrarAlerta('❌ Ingrese un número de teléfono válido', 'danger');
+                return;
+            }
+
+            const datos = recolectarDatos();
+            const conceptos = {
+                'apto': '✅ APTO PARA OPERAR',
+                'no-apto': '❌ NO APTO',
+                'mantenimiento': '🔧 REQUIERE MANTENIMIENTO'
+            };
+
+            let mensaje = `*INSPECCIÓN PREOPERACIONAL - SOLDADURA*%0A%0A`;
+            mensaje += `*Fecha:* ${datos.fecha}%0A`;
+            mensaje += `*Soldador:* ${datos.nombreSoldador}%0A`;
+            mensaje += `*Lugar:* ${datos.lugarTrabajo}%0A%0A`;
+            mensaje += `*Concepto:* ${conceptos[datos.conceptoFinal]}%0A%0A`;
+            
+            if (datos.observacionesFinales) {
+                mensaje += `*Observaciones:* ${datos.observacionesFinales}%0A`;
+            }
+
+            window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank');
+            cerrarWhatsApp();
+            mostrarAlerta('💬 Redirigiendo a WhatsApp...', 'success');
+        }
+
+        // Historial
+        function verHistorial() {
+            const historial = JSON.parse(localStorage.getItem('inspeccionesSoldadura') || '[]');
+            const modal = document.getElementById('historialModal');
+            const body = document.getElementById('historialBody');
+
+            if (historial.length === 0) {
+                body.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No hay reportes guardados</p>';
+            } else {
+                body.innerHTML = historial.map((reporte, index) => {
+                    const badgeClass = reporte.conceptoFinal === 'apto' ? 'badge-apto' : 
+                                      reporte.conceptoFinal === 'no-apto' ? 'badge-no-apto' : 'badge-mantenimiento';
+                    const badgeText = reporte.conceptoFinal === 'apto' ? 'APTO' : 
+                                     reporte.conceptoFinal === 'no-apto' ? 'NO APTO' : 'MANTENIMIENTO';
+                    
+                    return `
+                        <div class="reporte-card">
+                            <div class="reporte-header">
+                                <div>
+                                    <div class="reporte-title">${reporte.nombreSoldador} - ${reporte.lugarTrabajo}</div>
+                                    <div class="reporte-date">${reporte.fecha} | ${reporte.fechaCreacion}</div>
+                                </div>
+                                <span class="badge ${badgeClass}">${badgeText}</span>
+                            </div>
+                            <div class="reporte-actions">
+                                <button class="btn btn-success btn-small" onclick="descargarPDFHistorial(${index})">📄 PDF</button>
+                                <button class="btn btn-warning btn-small" onclick="enviarWhatsAppHistorial(${index})">💬 WhatsApp</button>
+                                <button class="btn btn-danger btn-small" onclick="eliminarReporte(${index})">🗑️ Eliminar</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function cerrarHistorial() {
+            document.getElementById('historialModal').style.display = 'none';
+        }
+
+        function eliminarReporte(index) {
+            if (!confirm('¿Está seguro de eliminar este reporte?')) return;
+            
+            let historial = JSON.parse(localStorage.getItem('inspeccionesSoldadura') || '[]');
+            historial.splice(index, 1);
+            localStorage.setItem('inspeccionesSoldadura', JSON.stringify(historial));
+            verHistorial();
+            mostrarAlerta('🗑️ Reporte eliminado', 'success');
+        }
+
+        function descargarPDFHistorial(index) {
+            const historial = JSON.parse(localStorage.getItem('inspeccionesSoldadura') || '[]');
+            const datos = historial[index];
+            // Reutilizar función de PDF con datos existentes
+            generarPDFDesdeDatos(datos);
+        }
+
+        function enviarWhatsAppHistorial(index) {
+            const historial = JSON.parse(localStorage.getItem('inspeccionesSoldadura') || '[]');
+            const datos = historial[index];
+            
+            document.getElementById('whatsappModal').style.display = 'flex';
+            // Guardar índice para usar al confirmar
+            window.historialIndexWhatsApp = index;
+        }
+
+        // Generar PDF desde datos históricos
+        async function generarPDFDesdeDatos(datos) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Mismo formato que generarPDF pero con datos proporcionados
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text('FORMATO DE INSPECCIÓN PREOPERACIONAL', 105, 20, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text('Equipo de Soldadura', 105, 30, { align: 'center' });
+
+            let y = 50;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('1. INFORMACIÓN GENERAL', 10, y);
+            y += 10;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${datos.fecha}`, 10, y);
+            doc.text(`Soldador: ${datos.nombreSoldador}`, 70, y);
+            y += 7;
+            doc.text(`Cargo: ${datos.cargo}`, 10, y);
+            doc.text(`Lugar: ${datos.lugarTrabajo}`, 70, y);
+            y += 15;
+
+            // Tablas simplificadas para historial
+            function crearTabla(titulo, items, y) {
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'bold');
+                doc.text(titulo, 10, y);
+                y += 6;
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'normal');
+                items.forEach((item, i) => {
+                    if (y > 280) { doc.addPage(); y = 20; }
+                    const texto = `${i+1}. ${item.item}: ${item.valor}${item.observaciones ? ' - ' + item.observaciones : ''}`;
+                    const lines = doc.splitTextToSize(texto, 190);
+                    doc.text(lines, 10, y);
+                    y += lines.length * 4 + 2;
+                });
+                return y + 5;
+            }
+
+            y = crearTabla('A. ESTADO GENERAL DEL EQUIPO', datos.estadoGeneral, y);
+            y = crearTabla('B. CABLES Y ACCESORIOS', datos.cables, y);
+            y = crearTabla('C. SEGURIDAD INDUSTRIAL', datos.seguridad, y);
+            y = crearTabla('D. EPP', datos.epp, y);
+
+            if (y > 250) { doc.addPage(); y = 20; }
+            
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('4. CONCEPTO FINAL', 10, y);
+            y += 8;
+            doc.setFont(undefined, 'normal');
+            const conceptos = { 'apto': '✅ APTO', 'no-apto': '❌ NO APTO', 'mantenimiento': '🔧 MANTENIMIENTO' };
+            doc.text(conceptos[datos.conceptoFinal] || 'No definido', 10, y);
+
+            doc.save(`Inspeccion_Historial_${datos.fecha}_${datos.nombreSoldador}.pdf`);
+        }
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+            if (!confirm('¿Está seguro de limpiar todo el formulario?')) return;
+            
+            document.getElementById('inspeccionForm').reset();
+            document.getElementById('fecha').valueAsDate = new Date();
+            
+            // Limpiar canvas
+            ['canvas1', 'canvas2'].forEach(id => {
+                const canvas = document.getElementById(id);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                canvas.parentElement.querySelector('p').style.display = 'block';
+            });
+
+            mostrarAlerta('🗑️ Formulario limpiado', 'success');
+        }
+
+        // Cerrar modales al hacer click fuera
+        window.onclick = function(event) {
+            if (event.target.classList.contains('historial-modal')) {
+                cerrarHistorial();
+            }
+            if (event.target.classList.contains('whatsapp-modal')) {
+                cerrarWhatsApp();
+            }
+        }
+    </script>
+</body>
+</html>

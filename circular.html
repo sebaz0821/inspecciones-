@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preoperacional - Sierra Circular Compacta</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f39c12 0%, #c0392b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .app-container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        .header-app {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+        .header-app h1 { font-size: 26px; margin-bottom: 5px; }
+        .header-app p { opacity: 0.9; font-size: 14px; }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .form-header {
+            background: #f39c12;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .form-header h2 { font-size: 22px; }
+
+        .form-body { padding: 30px; }
+
+        .section-title {
+            color: #d35400;
+            font-size: 17px;
+            font-weight: 700;
+            margin: 25px 0 15px 0;
+            padding: 10px 15px;
+            background: #fef9e7;
+            border-left: 5px solid #f39c12;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 20px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .field-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .field-group input {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .field-group input:focus {
+            border-color: #f39c12;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin: 10px 0 20px 0;
+        }
+        th {
+            background: #f39c12;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        th:first-child { text-align: left; width: 50%; }
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e8e8e8;
+            text-align: center;
+        }
+        td:first-child { text-align: left; font-weight: 500; color: #2c3e50; padding-left: 12px; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr.subheader td {
+            background: #fef9e7;
+            font-weight: 700;
+            color: #d35400;
+            text-align: left;
+            padding-left: 12px;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .radio-option {
+            position: relative;
+            cursor: pointer;
+        }
+        .radio-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0; height: 0;
+        }
+        .radio-option .check-btn {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            line-height: 32px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.2s;
+            color: #888;
+        }
+        .radio-option input:checked + .check-btn.bueno {
+            background: #27ae60; border-color: #27ae60; color: white;
+        }
+        .radio-option input:checked + .check-btn.malo {
+            background: #e74c3c; border-color: #e74c3c; color: white;
+        }
+
+        .obs-input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 12px;
+            outline: none;
+        }
+        .obs-input:focus { border-color: #f39c12; }
+
+        .resumen-box {
+            background: #fef9e7;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .resumen-item {
+            text-align: center;
+        }
+        .resumen-item .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f39c12;
+        }
+        .resumen-item .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .epp-section {
+            background: #fff9e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #f1c40f;
+        }
+        .epp-section h3 {
+            color: #7d6608;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .epp-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #444;
+        }
+        .epp-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #f39c12;
+            cursor: pointer;
+        }
+
+        .advertencia-box {
+            background: #f8d7da;
+            border-left: 5px solid #e74c3c;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #721c24;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .advertencia-box strong {
+            color: #c0392b;
+            font-size: 15px;
+        }
+
+        .verificacion-box {
+            background: #e8f4f8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+        }
+        .verificacion-box h3 {
+            color: #1a5276;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .verificacion-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #d0e8f2;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .verificacion-item:last-child { border-bottom: none; }
+        .verificacion-options {
+            display: flex;
+            gap: 15px;
+        }
+        .verificacion-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid #ddd;
+            transition: all 0.2s;
+        }
+        .verificacion-options input { display: none; }
+        .verificacion-options input:checked + span.si {
+            background: #d4edda; border-color: #27ae60; color: #155724;
+        }
+        .verificacion-options input:checked + span.no {
+            background: #f8d7da; border-color: #e74c3c; color: #721c24;
+        }
+
+        .instrucciones-box {
+            background: #fdf2e9;
+            border-left: 5px solid #e67e22;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .instrucciones-box h3 {
+            color: #7e5109;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .instrucciones-box ol {
+            padding-left: 20px;
+            color: #7e5109;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .resultado-box {
+            background: #eaf2f8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .resultado-box h3 {
+            color: #1a5276;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .resultado-opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .resultado-opciones label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .resultado-opciones label:hover {
+            border-color: #2980b9;
+        }
+        .resultado-opciones input {
+            width: 20px;
+            height: 20px;
+            accent-color: #f39c12;
+        }
+        .resultado-opciones label.operativo {
+            background: #d4edda;
+            border-color: #27ae60;
+            color: #155724;
+        }
+        .resultado-opciones label.no-operativo {
+            background: #f8d7da;
+            border-color: #e74c3c;
+            color: #721c24;
+        }
+
+        .firma-final {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        .firma-final label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .firma-final input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #333;
+            padding: 8px;
+            font-size: 14px;
+            outline: none;
+            text-align: center;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-pdf {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-pdf:hover { background: #c0392b; transform: translateY(-2px); }
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        .btn-whatsapp:hover { background: #128c7e; transform: translateY(-2px); }
+        .btn-reset {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-reset:hover { background: #7f8c8d; }
+        .btn-guardar {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-guardar:hover { background: #d68910; transform: translateY(-2px); }
+
+        .historial-section {
+            margin-top: 30px;
+        }
+        .historial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .historial-header h3 {
+            color: white;
+            font-size: 20px;
+        }
+        .historial-count {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .reporte-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .reporte-info h4 {
+            color: #d35400;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .reporte-info p {
+            color: #666;
+            font-size: 13px;
+        }
+        .reporte-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-small {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-del { background: #e74c3c; color: white; }
+        .btn-del:hover { background: #c0392b; }
+        .btn-view { background: #f39c12; color: white; }
+        .btn-view:hover { background: #d68910; }
+        .btn-wa-small { background: #25d366; color: white; }
+        .btn-wa-small:hover { background: #128c7e; }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            opacity: 0.7;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .modal-header h3 { color: #d35400; font-size: 20px; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+        }
+        .modal-close:hover { color: #333; }
+
+        @media (max-width: 768px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .actions-bar { flex-direction: column; }
+            th { font-size: 11px; padding: 8px 4px; }
+            td { padding: 8px 4px; }
+            .reporte-card { flex-direction: column; align-items: flex-start; }
+            .verificacion-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+        }
+
+        /* Modo PDF */
+        .pdf-mode {
+            background: white !important;
+            padding: 0 !important;
+        }
+        .pdf-mode .header-app, .pdf-mode .actions-bar, .pdf-mode .resumen-box,
+        .pdf-mode .historial-section, .pdf-mode .modal-overlay { display: none !important; }
+        .pdf-mode .form-card { box-shadow: none !important; border-radius: 0 !important; margin-bottom: 0 !important; }
+        .pdf-mode .radio-option .check-btn {
+            border: 2px solid #333 !important;
+            color: #333 !important;
+            background: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.bueno {
+            background: #27ae60 !important; color: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.malo {
+            background: #e74c3c !important; color: white !important;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-app">
+            <h1>🪚 Sistema de Preoperacionales</h1>
+            <p>Complete el formulario, guarde en historial, genere PDF y notifique vía WhatsApp</p>
+        </div>
+
+        <div class="form-card" id="form-content">
+            <div class="form-header">
+                <h2>📋 Formato Preoperacional: Sierra Circular Compacta</h2>
+            </div>
+
+            <div class="form-body">
+                <div class="section-title"><span class="icon">📄</span> Información del Equipo</div>
+                <div class="info-grid">
+                    <div class="field-group">
+                        <label>Responsable</label>
+                        <input type="text" id="responsable" placeholder="Nombre completo">
+                    </div>
+                    <div class="field-group">
+                        <label>Fecha</label>
+                        <input type="date" id="fecha">
+                    </div>
+                </div>
+
+                <div class="resumen-box" id="resumen-box">
+                    <div class="resumen-item">
+                        <div class="num" id="total-ok">0</div>
+                        <div class="label">✓ Bueno</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="num" id="total-bad">0</div>
+                        <div class="label">✗ Malo</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="num" id="total-pend">0</div>
+                        <div class="label">Pendientes</div>
+                    </div>
+                </div>
+
+                <div class="section-title"><span class="icon">✅</span> Lista de Verificación (Marcar con ✓ o X)</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Elemento a Inspeccionar</th>
+                            <th>Bueno</th>
+                            <th>Malo</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-verificacion"></tbody>
+                </table>
+
+                <div class="epp-section">
+                    <h3>🦺 Elementos de Protección Personal (EPP)</h3>
+                    <div id="epp-lista"></div>
+                </div>
+
+                <div class="advertencia-box">
+                    <strong>⚠️ ADVERTENCIA:</strong> No usar guantes holgados, bufandas o ropa suelta que pueda ser atrapada por el disco en movimiento.
+                </div>
+
+                <div class="verificacion-box">
+                    <h3>🔧 Verificación de Seguridad en la Operación</h3>
+                    <div id="verificacion-seguridad"></div>
+                </div>
+
+                <div class="instrucciones-box">
+                    <h3>⚠️ Instrucciones Críticas de Seguridad</h3>
+                    <ol>
+                        <li><strong>Ajuste de Profundidad:</strong> El disco no debe sobresalir más de 3 mm (1/8") por debajo del material a cortar.</li>
+                        <li><strong>Cambio de Disco:</strong> Desconecte totalmente la herramienta de la fuente de energía antes de manipular el disco.</li>
+                        <li><strong>Kickback (Retroceso):</strong> Nunca se ubique directamente detrás de la línea de corte; manténgase a un lado para evitar lesiones si la sierra salta hacia atrás.</li>
+                        <li><strong>Soporte:</strong> Nunca sostenga la pieza de trabajo con la mano o sobre las piernas mientras corta.</li>
+                    </ol>
+                </div>
+
+                <div class="resultado-box">
+                    <h3>📊 Concepto Final</h3>
+                    <div class="resultado-opciones">
+                        <label class="operativo">
+                            <input type="radio" name="resultado" value="OPERATIVO" onchange="actualizarResultado()">
+                            <span>✅ OPERATIVO: Equipo seguro para trabajar.</span>
+                        </label>
+                        <label class="no-operativo">
+                            <input type="radio" name="resultado" value="NO_OPERATIVO" onchange="actualizarResultado()">
+                            <span>❌ NO OPERATIVO: Retirar herramienta y etiquetar como defectuosa.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="firma-final">
+                    <label>Firma del Operador</label>
+                    <input type="text" id="firma-operador" placeholder="Nombre y firma del operador">
+                </div>
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-reset" onclick="limpiarFormulario()">🔄 Limpiar</button>
+                <button class="btn btn-guardar" onclick="guardarReporte()">💾 Guardar en Historial</button>
+                <button class="btn btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
+                <button class="btn btn-whatsapp" onclick="enviarWhatsApp()">💬 Enviar WhatsApp</button>
+            </div>
+        </div>
+
+        <div class="historial-section" id="historial-section">
+            <div class="historial-header">
+                <h3>📁 Historial de Reportes Guardados</h3>
+                <span class="historial-count" id="historial-count">0 reportes</span>
+            </div>
+            <div id="historial-lista"></div>
+        </div>
+    </div>
+
+    <!-- Modal para ver reporte -->
+    <div class="modal-overlay" id="modal-ver">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Ver Reporte Guardado</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+            <div style="margin-top:20px; text-align:center;">
+                <button class="btn btn-pdf" onclick="descargarDesdeModal()">📄 Descargar este PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const elementos = [
+            { tipo: 'header', texto: '1. Integridad Eléctrica' },
+            { tipo: 'item', texto: 'Cable de alimentación (sin peladuras ni empalmes)' },
+            { tipo: 'item', texto: 'Clavija/Enchufe (con conexión a tierra y sin quemaduras)' },
+            { tipo: 'item', texto: 'Gatillo de accionamiento (regresa solo al soltarlo)' },
+            { tipo: 'item', texto: 'Botón de bloqueo de seguridad (funciona correctamente)' },
+            { tipo: 'header', texto: '2. El Disco y Sujeción' },
+            { tipo: 'item', texto: 'Disco afilado y sin dientes faltantes o fisuras' },
+            { tipo: 'item', texto: 'El disco es el adecuado para el material a cortar' },
+            { tipo: 'item', texto: 'Tuerca de sujeción (flange) apretada correctamente' },
+            { tipo: 'item', texto: 'Sentido de giro del disco correcto (según flecha)' },
+            { tipo: 'header', texto: '3. Sistemas de Protección (Crítico)' },
+            { tipo: 'item', texto: 'Guarda móvil inferior: (Cierra sola y rápidamente)' },
+            { tipo: 'item', texto: 'Guarda superior fija (sin roturas)' },
+            { tipo: 'item', texto: 'Ajuste de profundidad de corte (firme y funcional)' },
+            { tipo: 'item', texto: 'Ajuste de ángulo de bisel (si aplica)' },
+            { tipo: 'header', texto: '4. Estructura y Limpieza' },
+            { tipo: 'item', texto: 'Base o zapata de la sierra (derecha y sin golpes)' },
+            { tipo: 'item', texto: 'Guía paralela (si se usa, debe estar firme)' },
+            { tipo: 'item', texto: 'Rejillas de ventilación del motor limpias (sin aserrín)' },
+            { tipo: 'item', texto: 'Mango de sujeción limpio (libre de grasa o aceite)' }
+        ];
+
+        const eppItems = [
+            { texto: 'Gafas de seguridad', nota: 'Ajustadas para evitar entrada de virutas' },
+            { texto: 'Protector facial', nota: 'Recomendado adicional a las gafas' },
+            { texto: 'Protección auditiva', nota: 'Tipo inserción o copa' },
+            { texto: 'Protección respiratoria', nota: 'Mascarilla para polvo N95 o superior' },
+            { texto: 'Calzado de seguridad', nota: 'Puntera reforzada' }
+        ];
+
+        const preguntasVerificacion = [
+            '¿El área de corte está libre de clavos o materiales metálicos?',
+            '¿La pieza de trabajo está asegurada con prensas/sargentos?',
+            '¿El disco deja de girar en menos de 3-5 segundos tras apagar?'
+        ];
+
+        let idCounter = 0;
+        function genId() { return 'chk_' + (idCounter++); }
+        let reportesGuardados = [];
+        let reporteActualEnModal = null;
+
+        // Renderizar tabla
+        function renderTabla() {
+            const tbody = document.getElementById('tabla-verificacion');
+            tbody.innerHTML = '';
+            elementos.forEach((elem) => {
+                if (elem.tipo === 'header') {
+                    const row = document.createElement('tr');
+                    row.className = 'subheader';
+                    row.innerHTML = `<td colspan="4">${elem.texto}</td>`;
+                    tbody.appendChild(row);
+                } else {
+                    const id = genId();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${elem.texto}</td>
+                        <td>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="${id}" value="bueno" onchange="actualizarResumen()">
+                                    <span class="check-btn bueno">✓</span>
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="${id}" value="malo" onchange="actualizarResumen()">
+                                    <span class="check-btn malo">✗</span>
+                                </label>
+                            </div>
+                        </td>
+                        <td><input type="text" class="obs-input" placeholder="Obs..." data-item="${elem.texto}"></td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+        }
+
+        // Renderizar EPP
+        function renderEPP() {
+            const container = document.getElementById('epp-lista');
+            eppItems.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'epp-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="epp_${idx}" data-epp="${item.texto}">
+                    <label for="epp_${idx}"><strong>${item.texto}:</strong> <span style="color:#888;font-size:12px;">(${item.nota})</span></label>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Renderizar verificación de seguridad
+        function renderVerificacion() {
+            const container = document.getElementById('verificacion-seguridad');
+            preguntasVerificacion.forEach((pregunta, idx) => {
+                const id = 'verif_' + idx;
+                const div = document.createElement('div');
+                div.className = 'verificacion-item';
+                div.innerHTML = `
+                    <span>${pregunta}</span>
+                    <div class="verificacion-options">
+                        <label>
+                            <input type="radio" name="${id}" value="si">
+                            <span class="si">✓ Sí</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="${id}" value="no">
+                            <span class="no">✗ No</span>
+                        </label>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Actualizar resumen
+        function actualizarResumen() {
+            let ok = 0, bad = 0, pend = 0;
+            const radios = document.querySelectorAll('input[type="radio"]:checked');
+            radios.forEach(r => {
+                if (r.value === 'bueno') ok++;
+                else if (r.value === 'malo') bad++;
+            });
+            const totalItems = elementos.filter(e => e.tipo === 'item').length;
+            pend = totalItems - ok - bad;
+
+            document.getElementById('total-ok').textContent = ok;
+            document.getElementById('total-bad').textContent = bad;
+            document.getElementById('total-pend').textContent = pend;
+        }
+
+        function actualizarResultado() {
+            // Visual update if needed
+        }
+
+        // Obtener datos del formulario
+        function obtenerDatosFormulario() {
+            const datos = {
+                responsable: document.getElementById('responsable').value,
+                fecha: document.getElementById('fecha').value,
+                firmaOperador: document.getElementById('firma-operador').value,
+                resultado: document.querySelector('input[name="resultado"]:checked')?.value || '',
+                items: [],
+                epp: [],
+                verificacion: [],
+                timestamp: new Date().toISOString()
+            };
+
+            // Recorrer items
+            const rows = document.querySelectorAll('#tabla-verificacion tr');
+            let currentHeader = '';
+            rows.forEach(row => {
+                if (row.classList.contains('subheader')) {
+                    currentHeader = row.textContent.trim();
+                } else {
+                    const cells = row.querySelectorAll('td');
+                    const itemText = cells[0].textContent.trim();
+                    let valor = '';
+                    const radios = row.querySelectorAll('input[type="radio"]');
+                    radios.forEach(r => { if (r.checked) valor = r.value; });
+                    const obs = cells[3] ? cells[3].querySelector('input').value : '';
+                    datos.items.push({
+                        categoria: currentHeader,
+                        item: itemText,
+                        valor: valor,
+                        observaciones: obs
+                    });
+                }
+            });
+
+            // EPP
+            document.querySelectorAll('.epp-item input[type="checkbox"]').forEach(cb => {
+                datos.epp.push({
+                    item: cb.getAttribute('data-epp'),
+                    checked: cb.checked
+                });
+            });
+
+            // Verificación de seguridad
+            preguntasVerificacion.forEach((preg, idx) => {
+                const val = document.querySelector(`input[name="verif_${idx}"]:checked`)?.value || '';
+                datos.verificacion.push({ pregunta: preg, valor: val });
+            });
+
+            datos.totalOk = datos.items.filter(i => i.valor === 'bueno').length;
+            datos.totalBad = datos.items.filter(i => i.valor === 'malo').length;
+            datos.totalEpp = datos.epp.filter(e => e.checked).length;
+
+            return datos;
+        }
+
+        // Guardar reporte
+        function guardarReporte() {
+            const datos = obtenerDatosFormulario();
+            if (!datos.fecha) {
+                alert('Por favor ingrese la fecha.');
+                return;
+            }
+            if (!datos.responsable) {
+                alert('Por favor ingrese el nombre del responsable.');
+                return;
+            }
+            if (!datos.resultado) {
+                alert('Por favor seleccione el concepto final de la inspección.');
+                return;
+            }
+
+            reportesGuardados.push(datos);
+            renderHistorial();
+            alert('✅ Reporte guardado en el historial exitosamente.');
+        }
+
+        // Renderizar historial
+        function renderHistorial() {
+            const lista = document.getElementById('historial-lista');
+            const count = document.getElementById('historial-count');
+            count.textContent = `${reportesGuardados.length} reporte${reportesGuardados.length !== 1 ? 's' : ''}`;
+
+            if (reportesGuardados.length === 0) {
+                lista.innerHTML = '<div class="empty-state">No hay reportes guardados aún. Complete el formulario y presione "Guardar en Historial".</div>';
+                return;
+            }
+
+            lista.innerHTML = '';
+            reportesGuardados.forEach((rep, idx) => {
+                const card = document.createElement('div');
+                card.className = 'reporte-card';
+                const fechaStr = rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : 'Sin fecha';
+                const resultadoText = rep.resultado === 'OPERATIVO' ? '✅ OPERATIVO' : '❌ NO OPERATIVO';
+                const resultadoColor = rep.resultado === 'OPERATIVO' ? '#27ae60' : '#e74c3c';
+                card.innerHTML = `
+                    <div class="reporte-info">
+                        <h4>🪚 Sierra Circular — ${rep.responsable}</h4>
+                        <p>📅 ${fechaStr} | <span style="color:${resultadoColor};font-weight:700;">${resultadoText}</span> | ✓ ${rep.totalOk} ✗ ${rep.totalBad} | 🦺 EPP: ${rep.totalEpp}/5</p>
+                    </div>
+                    <div class="reporte-actions">
+                        <button class="btn-small btn-view" onclick="verReporte(${idx})">👁️ Ver</button>
+                        <button class="btn-small btn-wa-small" onclick="enviarWhatsAppHistorial(${idx})">💬 WA</button>
+                        <button class="btn-small btn-del" onclick="eliminarReporte(${idx})">🗑️ Borrar</button>
+                    </div>
+                `;
+                lista.appendChild(card);
+            });
+        }
+
+        // Ver reporte en modal
+        function verReporte(idx) {
+            const rep = reportesGuardados[idx];
+            reporteActualEnModal = rep;
+            const modalBody = document.getElementById('modal-body');
+
+            let itemsHtml = '';
+            let currentCat = '';
+            rep.items.forEach(it => {
+                if (it.categoria !== currentCat) {
+                    currentCat = it.categoria;
+                    itemsHtml += `<tr style="background:#fef9e7;font-weight:700;color:#d35400;"><td colspan="3">${currentCat}</td></tr>`;
+                }
+                const valText = it.valor === 'bueno' ? '<span style="color:#27ae60;font-weight:700;">✓ Bueno</span>' :
+                               it.valor === 'malo' ? '<span style="color:#e74c3c;font-weight:700;">✗ Malo</span>' :
+                               '<span style="color:#999;">—</span>';
+                itemsHtml += `<tr>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;">${it.item}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;text-align:center;">${valText}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;font-size:12px;color:#666;">${it.observaciones || '-'}</td>
+                </tr>`;
+            });
+
+            let eppHtml = '';
+            rep.epp.forEach(e => {
+                const check = e.checked ? '✅' : '⬜';
+                eppHtml += `<li style="padding:4px 0;">${check} ${e.item}</li>`;
+            });
+
+            let verifHtml = '';
+            rep.verificacion.forEach(v => {
+                const valText = v.valor === 'si' ? '✓ Sí' : v.valor === 'no' ? '✗ No' : '—';
+                verifHtml += `<li style="padding:4px 0;"><strong>${v.pregunta}</strong> → ${valText}</li>`;
+            });
+
+            const resultadoText = rep.resultado === 'OPERATIVO' ? '✅ OPERATIVO: Equipo seguro para trabajar.' : '❌ NO OPERATIVO: Retirar herramienta y etiquetar como defectuosa.';
+
+            modalBody.innerHTML = `
+                <div style="margin-bottom:15px;line-height:1.8;">
+                    <p><strong>Responsable:</strong> ${rep.responsable || '—'}</p>
+                    <p><strong>Fecha:</strong> ${rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : '—'}</p>
+                    <p><strong>Firma:</strong> ${rep.firmaOperador || '—'}</p>
+                    <p><strong>Resultado:</strong> ${resultadoText}</p>
+                </div>
+                <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:20px;">
+                    <thead>
+                        <tr style="background:#f39c12;color:white;">
+                            <th style="padding:10px;text-align:left;">Elemento</th>
+                            <th style="padding:10px;text-align:center;width:100px;">Estado</th>
+                            <th style="padding:10px;text-align:left;width:200px;">Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>${itemsHtml}</tbody>
+                </table>
+                <div style="background:#fff9e6;padding:15px;border-radius:8px;margin-bottom:15px;">
+                    <h4 style="color:#7d6608;margin-bottom:10px;">🦺 EPP Verificado</h4>
+                    <ul style="list-style:none;padding:0;font-size:13px;color:#444;">${eppHtml}</ul>
+                </div>
+                <div style="background:#e8f4f8;padding:15px;border-radius:8px;margin-bottom:15px;">
+                    <h4 style="color:#1a5276;margin-bottom:10px;">🔧 Verificación de Seguridad</h4>
+                    <ul style="list-style:none;padding:0;font-size:13px;color:#444;">${verifHtml}</ul>
+                </div>
+            `;
+            document.getElementById('modal-ver').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-ver').classList.remove('active');
+            reporteActualEnModal = null;
+        }
+
+        function descargarDesdeModal() {
+            if (!reporteActualEnModal) return;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `
+                <div style="padding:20px;font-family:Arial,sans-serif;">
+                    <h2 style="color:#d35400;text-align:center;margin-bottom:20px;">Preoperacional: Sierra Circular Compacta</h2>
+                    ${document.getElementById('modal-body').innerHTML}
+                </div>
+            `;
+            document.body.appendChild(tempDiv);
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Preoperacional_Sierra_${reporteActualEnModal.fecha || 'sinfecha'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(tempDiv).save().then(() => {
+                document.body.removeChild(tempDiv);
+            });
+        }
+
+        // Eliminar reporte
+        function eliminarReporte(idx) {
+            if (confirm('¿Está seguro de eliminar este reporte del historial?')) {
+                reportesGuardados.splice(idx, 1);
+                renderHistorial();
+            }
+        }
+
+        // Enviar WhatsApp desde historial
+        function enviarWhatsAppHistorial(idx) {
+            const rep = reportesGuardados[idx];
+            const fechaStr = rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : 'Sin fecha';
+            const resultadoEmoji = rep.resultado === 'OPERATIVO' ? '✅' : '❌';
+
+            const mensaje = `*PREOPERACIONAL SIERRA CIRCULAR COMPACTA*\n\n` +
+                `📅 Fecha: ${fechaStr}\n` +
+                `👤 Responsable: ${rep.responsable || 'Sin responsable'}\n\n` +
+                `✓ Bueno: ${rep.totalOk} | ✗ Malo: ${rep.totalBad}\n` +
+                `🦺 EPP verificado: ${rep.totalEpp}/5\n\n` +
+                `${resultadoEmoji} Resultado: ${rep.resultado === 'OPERATIVO' ? 'OPERATIVO' : 'NO OPERATIVO'}\n\n` +
+                `Reporte guardado en historial local.`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        // Generar PDF del formulario actual
+        function generarPDF() {
+            const responsable = document.getElementById('responsable').value || 'sin_responsable';
+            const fecha = document.getElementById('fecha').value || new Date().toISOString().split('T')[0];
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Preoperacional_Sierra_${responsable}_${fecha}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            document.body.classList.add('pdf-mode');
+            html2pdf().set(opt).from(document.getElementById('form-content')).save().then(() => {
+                document.body.classList.remove('pdf-mode');
+            }).catch(() => {
+                document.body.classList.remove('pdf-mode');
+            });
+        }
+
+        // Enviar WhatsApp del formulario actual
+        function enviarWhatsApp() {
+            const fecha = document.getElementById('fecha').value || new Date().toLocaleDateString();
+            const responsable = document.getElementById('responsable').value || 'Sin responsable';
+            const resultado = document.querySelector('input[name="resultado"]:checked')?.value || '';
+
+            let ok = 0, bad = 0;
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => {
+                if (r.value === 'bueno') ok++;
+                else if (r.value === 'malo') bad++;
+            });
+
+            let eppCount = 0;
+            document.querySelectorAll('.epp-item input[type="checkbox"]').forEach(cb => {
+                if (cb.checked) eppCount++;
+            });
+
+            const resultadoEmoji = resultado === 'OPERATIVO' ? '✅' : resultado === 'NO_OPERATIVO' ? '❌' : '⬜';
+            const resultadoText = resultado === 'OPERATIVO' ? 'OPERATIVO' :
+                                 resultado === 'NO_OPERATIVO' ? 'NO OPERATIVO' : 'Sin resultado definido';
+
+            const mensaje = `*PREOPERACIONAL SIERRA CIRCULAR COMPACTA*\n\n` +
+                `📅 Fecha: ${fecha}\n` +
+                `👤 Responsable: ${responsable}\n\n` +
+                `✓ Bueno: ${ok} | ✗ Malo: ${bad}\n` +
+                `🦺 EPP verificado: ${eppCount}/5\n\n` +
+                `${resultadoEmoji} Resultado: ${resultadoText}\n\n` +
+                `El reporte PDF ha sido generado y guardado localmente.`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+            if(confirm('¿Está seguro de limpiar todo el formulario?')) {
+                document.querySelectorAll('input[type="text"], input[type="date"]').forEach(el => el.value = '');
+                document.querySelectorAll('input[type="radio"]:checked').forEach(el => el.checked = false);
+                document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+                document.querySelectorAll('.obs-input').forEach(el => el.value = '');
+                document.getElementById('fecha').valueAsDate = new Date();
+                actualizarResumen();
+            }
+        }
+
+        // Inicializar
+        renderTabla();
+        renderEPP();
+        renderVerificacion();
+        document.getElementById('fecha').valueAsDate = new Date();
+        renderHistorial();
+    </script>
+</body>
+</html>

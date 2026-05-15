@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspección de Botiquín de Emergencia</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #c0392b 0%, #8e44ad 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .app-container {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+        .header-app {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+        .header-app h1 { font-size: 26px; margin-bottom: 5px; }
+        .header-app p { opacity: 0.9; font-size: 14px; }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .form-header {
+            background: #c0392b;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .form-header h2 { font-size: 22px; }
+
+        .form-body { padding: 30px; }
+
+        .section-title {
+            color: #c0392b;
+            font-size: 17px;
+            font-weight: 700;
+            margin: 25px 0 15px 0;
+            padding: 10px 15px;
+            background: #fdecea;
+            border-left: 5px solid #e74c3c;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 20px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .field-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .field-group input, .field-group select {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .field-group input:focus, .field-group select:focus {
+            border-color: #e74c3c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 10px 0 20px 0;
+        }
+        th {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        th:first-child { text-align: left; }
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e8e8e8;
+            text-align: center;
+        }
+        td:first-child { text-align: left; font-weight: 500; color: #2c3e50; padding-left: 12px; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr.subheader td {
+            background: #fdecea;
+            font-weight: 700;
+            color: #c0392b;
+            text-align: left;
+            padding-left: 12px;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .radio-option {
+            position: relative;
+            cursor: pointer;
+        }
+        .radio-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0; height: 0;
+        }
+        .radio-option .check-btn {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            line-height: 32px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.2s;
+            color: #888;
+        }
+        .radio-option input:checked + .check-btn.bueno {
+            background: #27ae60; border-color: #27ae60; color: white;
+        }
+        .radio-option input:checked + .check-btn.malo {
+            background: #e74c3c; border-color: #e74c3c; color: white;
+        }
+        .radio-option input:checked + .check-btn.na {
+            background: #95a5a6; border-color: #95a5a6; color: white;
+        }
+
+        .obs-input, .cant-input, .venc-input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 12px;
+            outline: none;
+            text-align: center;
+        }
+        .obs-input:focus, .cant-input:focus, .venc-input:focus { border-color: #e74c3c; }
+        .cant-input { width: 60px; }
+        .venc-input { width: 100px; }
+
+        .resumen-box {
+            background: #fdecea;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .resumen-item {
+            text-align: center;
+        }
+        .resumen-item .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #c0392b;
+        }
+        .resumen-item .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .text-area-box {
+            margin: 20px 0;
+        }
+        .text-area-box label {
+            display: block;
+            font-weight: 600;
+            color: #c0392b;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .text-area-box textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+        }
+        .text-area-box textarea:focus { border-color: #e74c3c; }
+
+        .resultado-box {
+            background: #eaf2f8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .resultado-box h3 {
+            color: #1a5276;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .resultado-opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .resultado-opciones label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .resultado-opciones label:hover {
+            border-color: #2980b9;
+        }
+        .resultado-opciones input {
+            width: 20px;
+            height: 20px;
+            accent-color: #e74c3c;
+        }
+        .resultado-opciones label.completo {
+            background: #d4edda;
+            border-color: #27ae60;
+            color: #155724;
+        }
+        .resultado-opciones label.reposicion {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .plazo-input {
+            margin-left: auto;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            width: 140px;
+        }
+
+        .firma-final {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        .firma-final label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .firma-final input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #333;
+            padding: 8px;
+            font-size: 14px;
+            outline: none;
+            text-align: center;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-pdf {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-pdf:hover { background: #c0392b; transform: translateY(-2px); }
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        .btn-whatsapp:hover { background: #128c7e; transform: translateY(-2px); }
+        .btn-reset {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-reset:hover { background: #7f8c8d; }
+        .btn-guardar {
+            background: #c0392b;
+            color: white;
+        }
+        .btn-guardar:hover { background: #a93226; transform: translateY(-2px); }
+
+        .historial-section {
+            margin-top: 30px;
+        }
+        .historial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .historial-header h3 {
+            color: white;
+            font-size: 20px;
+        }
+        .historial-count {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .reporte-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .reporte-info h4 {
+            color: #c0392b;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .reporte-info p {
+            color: #666;
+            font-size: 13px;
+        }
+        .reporte-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-small {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-del { background: #e74c3c; color: white; }
+        .btn-del:hover { background: #c0392b; }
+        .btn-view { background: #c0392b; color: white; }
+        .btn-view:hover { background: #a93226; }
+        .btn-wa-small { background: #25d366; color: white; }
+        .btn-wa-small:hover { background: #128c7e; }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            opacity: 0.7;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 950px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .modal-header h3 { color: #c0392b; font-size: 20px; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+        }
+        .modal-close:hover { color: #333; }
+
+        @media (max-width: 768px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .actions-bar { flex-direction: column; }
+            th { font-size: 10px; padding: 6px 3px; }
+            td { padding: 6px 3px; }
+            .reporte-card { flex-direction: column; align-items: flex-start; }
+            .cant-input { width: 50px; }
+            .venc-input { width: 80px; }
+        }
+
+        /* Modo PDF */
+        .pdf-mode {
+            background: white !important;
+            padding: 0 !important;
+        }
+        .pdf-mode .header-app, .pdf-mode .actions-bar, .pdf-mode .resumen-box,
+        .pdf-mode .historial-section, .pdf-mode .modal-overlay { display: none !important; }
+        .pdf-mode .form-card { box-shadow: none !important; border-radius: 0 !important; margin-bottom: 0 !important; }
+        .pdf-mode .radio-option .check-btn {
+            border: 2px solid #333 !important;
+            color: #333 !important;
+            background: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.bueno {
+            background: #27ae60 !important; color: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.malo {
+            background: #e74c3c !important; color: white !important;
+        }
+        .pdf-mode .radio-option input:checked + .check-btn.na {
+            background: #95a5a6 !important; color: white !important;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-app">
+            <h1>🚑 Sistema de Inspecciones</h1>
+            <p>Complete el formulario, guarde en historial, genere PDF y notifique vía WhatsApp</p>
+        </div>
+
+        <div class="form-card" id="form-content">
+            <div class="form-header">
+                <h2>📋 Formato de Inspección de Botiquín de Emergencia</h2>
+            </div>
+
+            <div class="form-body">
+                <div class="section-title"><span class="icon">📄</span> Información General</div>
+                <div class="info-grid">
+                    <div class="field-group">
+                        <label>Ubicación del Botiquín</label>
+                        <input type="text" id="ubicacion" placeholder="Ej: Oficina Principal - Piso 2">
+                    </div>
+                    <div class="field-group">
+                        <label>Tipo de Botiquín</label>
+                        <select id="tipo-botiquin">
+                            <option value="">Seleccione...</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="Portátil">Portátil</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>Responsable de Inspección</label>
+                        <input type="text" id="responsable" placeholder="Nombre completo">
+                    </div>
+                    <div class="field-group">
+                        <label>Fecha de Inspección</label>
+                        <input type="date" id="fecha">
+                    </div>
+                </div>
+
+                <div class="resumen-box" id="resumen-box">
+                    <div class="resumen-item">
+                        <div class="num" id="total-ok">0</div>
+                        <div class="label">✓ Cumple</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="num" id="total-bad">0</div>
+                        <div class="label">✗ No Cumple</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="num" id="total-pend">0</div>
+                        <div class="label">Pendientes</div>
+                    </div>
+                </div>
+
+                <div class="section-title"><span class="icon">📦</span> 1. Estado del Contenedor</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ítem a Inspeccionar</th>
+                            <th>Cumple (Sí)</th>
+                            <th>No Cumple</th>
+                            <th>N/A</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-contenedor"></tbody>
+                </table>
+
+                <div class="section-title"><span class="icon">💊</span> 2. Contenido (Material de Curación y Antisépticos)</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Elemento</th>
+                            <th>Cantidad Actual</th>
+                            <th>Fecha Vencimiento</th>
+                            <th>Bueno</th>
+                            <th>Malo</th>
+                            <th>N/A</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-contenido"></tbody>
+                </table>
+
+                <div class="section-title"><span class="icon">🔧</span> 3. Instrumental y Otros Elementos</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Elemento</th>
+                            <th>Cantidad</th>
+                            <th>Bueno</th>
+                            <th>Malo</th>
+                            <th>N/A</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-instrumental"></tbody>
+                </table>
+
+                <div class="text-area-box">
+                    <label for="observaciones-hallazgos">📝 Observaciones y Hallazgos:</label>
+                    <textarea id="observaciones-hallazgos" placeholder="Describa hallazgos relevantes durante la inspección..."></textarea>
+                </div>
+
+                <div class="text-area-box">
+                    <label for="acciones-correctivas">🔧 Acciones Correctivas:</label>
+                    <textarea id="acciones-correctivas" placeholder="Indique qué elementos deben reponerse o si se debe cambiar la ubicación..."></textarea>
+                </div>
+
+                <div class="resultado-box">
+                    <h3>📊 Resultado de la Inspección</h3>
+                    <div class="resultado-opciones">
+                        <label class="completo">
+                            <input type="radio" name="resultado" value="COMPLETO" onchange="actualizarResultado()">
+                            <span>✅ COMPLETO Y VIGENTE</span>
+                        </label>
+                        <label class="reposicion">
+                            <input type="radio" name="resultado" value="REPOSICION" onchange="actualizarResultado()">
+                            <span>⚠️ REQUIERE REPOSICIÓN</span>
+                            <input type="date" class="plazo-input" id="plazo-reposicion" placeholder="Plazo hasta">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="firma-final">
+                    <label>Firma del Responsable</label>
+                    <input type="text" id="firma-responsable" placeholder="Nombre y firma del responsable">
+                </div>
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-reset" onclick="limpiarFormulario()">🔄 Limpiar</button>
+                <button class="btn btn-guardar" onclick="guardarReporte()">💾 Guardar en Historial</button>
+                <button class="btn btn-pdf" onclick="generarPDF()">📄 Descargar PDF</button>
+                <button class="btn btn-whatsapp" onclick="enviarWhatsApp()">💬 Enviar WhatsApp</button>
+            </div>
+        </div>
+
+        <div class="historial-section" id="historial-section">
+            <div class="historial-header">
+                <h3>📁 Historial de Inspecciones Guardadas</h3>
+                <span class="historial-count" id="historial-count">0 reportes</span>
+            </div>
+            <div id="historial-lista"></div>
+        </div>
+    </div>
+
+    <!-- Modal para ver reporte -->
+    <div class="modal-overlay" id="modal-ver">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Ver Inspección Guardada</h3>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+            <div style="margin-top:20px; text-align:center;">
+                <button class="btn btn-pdf" onclick="descargarDesdeModal()">📄 Descargar este PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const contenedorItems = [
+            '¿El botiquín está señalizado correctamente?',
+            '¿Es de fácil acceso y está libre de obstáculos?',
+            '¿El estuche/gabinete está limpio y cierra bien?',
+            '¿Cuenta con el listado de teléfonos de emergencia?'
+        ];
+
+        const contenidoItems = [
+            'Gasa limpia (paquetes individuales)',
+            'Compresas de gasa esterilizadas',
+            'Esparadrapo de tela o micropore',
+            'Vendas elásticas (varios tamaños)',
+            'Vendas de gasa',
+            'Aplicadores (Copitos)',
+            'Bajalenguas',
+            'Curas (Banditas)',
+            'Solución Salina (Suero fisiológico)',
+            'Jabón quirúrgico',
+            'Guantes de látex o nitrilo (desechables)'
+        ];
+
+        const instrumentalItems = [
+            'Tijeras de trauma (punta roma)',
+            'Termómetro digital',
+            'Tapabocas desechables',
+            'Linterna con pilas funcionales',
+            'Manta térmica',
+            'Manual básico de primeros auxilios',
+            'Libreta y bolígrafo'
+        ];
+
+        let idCounter = 0;
+        function genId() { return 'chk_' + (idCounter++); }
+        let reportesGuardados = [];
+        let reporteActualEnModal = null;
+
+        // Renderizar tabla contenedor
+        function renderContenedor() {
+            const tbody = document.getElementById('tabla-contenedor');
+            contenedorItems.forEach((item) => {
+                const id = genId();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item}</td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="bueno" onchange="actualizarResumen()">
+                                <span class="check-btn bueno">✓</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="malo" onchange="actualizarResumen()">
+                                <span class="check-btn malo">✗</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="na" onchange="actualizarResumen()">
+                                <span class="check-btn na">N/A</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td><input type="text" class="obs-input" placeholder="Obs..."></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Renderizar tabla contenido
+        function renderContenido() {
+            const tbody = document.getElementById('tabla-contenido');
+            contenidoItems.forEach((item) => {
+                const id = genId();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item}</td>
+                    <td><input type="number" class="cant-input" placeholder="0" min="0"></td>
+                    <td><input type="date" class="venc-input"></td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="bueno" onchange="actualizarResumen()">
+                                <span class="check-btn bueno">✓</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="malo" onchange="actualizarResumen()">
+                                <span class="check-btn malo">✗</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="na" onchange="actualizarResumen()">
+                                <span class="check-btn na">N/A</span>
+                            </label>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Renderizar tabla instrumental
+        function renderInstrumental() {
+            const tbody = document.getElementById('tabla-instrumental');
+            instrumentalItems.forEach((item) => {
+                const id = genId();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item}</td>
+                    <td><input type="number" class="cant-input" placeholder="0" min="0"></td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="bueno" onchange="actualizarResumen()">
+                                <span class="check-btn bueno">✓</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="malo" onchange="actualizarResumen()">
+                                <span class="check-btn malo">✗</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="${id}" value="na" onchange="actualizarResumen()">
+                                <span class="check-btn na">N/A</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td><input type="text" class="obs-input" placeholder="Obs..."></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Actualizar resumen
+        function actualizarResumen() {
+            let ok = 0, bad = 0, na = 0, pend = 0;
+            const radios = document.querySelectorAll('input[type="radio"]:checked');
+            radios.forEach(r => {
+                if (r.value === 'bueno') ok++;
+                else if (r.value === 'malo') bad++;
+                else if (r.value === 'na') na++;
+            });
+            const totalItems = contenedorItems.length + contenidoItems.length + instrumentalItems.length;
+            pend = totalItems - ok - bad - na;
+
+            document.getElementById('total-ok').textContent = ok;
+            document.getElementById('total-bad').textContent = bad;
+            document.getElementById('total-pend').textContent = pend;
+        }
+
+        function actualizarResultado() {
+            // Visual update if needed
+        }
+
+        // Obtener datos del formulario
+        function obtenerDatosFormulario() {
+            const datos = {
+                ubicacion: document.getElementById('ubicacion').value,
+                tipoBotiquin: document.getElementById('tipo-botiquin').value,
+                responsable: document.getElementById('responsable').value,
+                fecha: document.getElementById('fecha').value,
+                firmaResponsable: document.getElementById('firma-responsable').value,
+                observacionesHallazgos: document.getElementById('observaciones-hallazgos').value,
+                accionesCorrectivas: document.getElementById('acciones-correctivas').value,
+                resultado: document.querySelector('input[name="resultado"]:checked')?.value || '',
+                plazoReposicion: document.getElementById('plazo-reposicion').value,
+                contenedor: [],
+                contenido: [],
+                instrumental: [],
+                timestamp: new Date().toISOString()
+            };
+
+            // Contenedor
+            const rowsCont = document.querySelectorAll('#tabla-contenedor tr');
+            rowsCont.forEach((row, idx) => {
+                const cells = row.querySelectorAll('td');
+                const itemText = contenedorItems[idx];
+                let valor = '';
+                const radios = row.querySelectorAll('input[type="radio"]');
+                radios.forEach(r => { if (r.checked) valor = r.value; });
+                const obs = cells[4] ? cells[4].querySelector('input').value : '';
+                datos.contenedor.push({ item: itemText, valor: valor, observaciones: obs });
+            });
+
+            // Contenido
+            const rowsContenido = document.querySelectorAll('#tabla-contenido tr');
+            rowsContenido.forEach((row, idx) => {
+                const cells = row.querySelectorAll('td');
+                const itemText = contenidoItems[idx];
+                const cantidad = cells[1] ? cells[1].querySelector('input').value : '';
+                const vencimiento = cells[2] ? cells[2].querySelector('input').value : '';
+                let valor = '';
+                const radios = row.querySelectorAll('input[type="radio"]');
+                radios.forEach(r => { if (r.checked) valor = r.value; });
+                datos.contenido.push({ item: itemText, cantidad: cantidad, vencimiento: vencimiento, valor: valor });
+            });
+
+            // Instrumental
+            const rowsInst = document.querySelectorAll('#tabla-instrumental tr');
+            rowsInst.forEach((row, idx) => {
+                const cells = row.querySelectorAll('td');
+                const itemText = instrumentalItems[idx];
+                const cantidad = cells[1] ? cells[1].querySelector('input').value : '';
+                let valor = '';
+                const radios = row.querySelectorAll('input[type="radio"]');
+                radios.forEach(r => { if (r.checked) valor = r.value; });
+                const obs = cells[5] ? cells[5].querySelector('input').value : '';
+                datos.instrumental.push({ item: itemText, cantidad: cantidad, valor: valor, observaciones: obs });
+            });
+
+            datos.totalOk = [...datos.contenedor, ...datos.contenido, ...datos.instrumental].filter(i => i.valor === 'bueno').length;
+            datos.totalBad = [...datos.contenedor, ...datos.contenido, ...datos.instrumental].filter(i => i.valor === 'malo').length;
+
+            return datos;
+        }
+
+        // Guardar reporte
+        function guardarReporte() {
+            const datos = obtenerDatosFormulario();
+            if (!datos.fecha) {
+                alert('Por favor ingrese la fecha de inspección.');
+                return;
+            }
+            if (!datos.responsable) {
+                alert('Por favor ingrese el nombre del responsable.');
+                return;
+            }
+            if (!datos.resultado) {
+                alert('Por favor seleccione el resultado de la inspección.');
+                return;
+            }
+
+            reportesGuardados.push(datos);
+            renderHistorial();
+            alert('✅ Inspección guardada en el historial exitosamente.');
+        }
+
+        // Renderizar historial
+        function renderHistorial() {
+            const lista = document.getElementById('historial-lista');
+            const count = document.getElementById('historial-count');
+            count.textContent = `${reportesGuardados.length} inspección${reportesGuardados.length !== 1 ? 'es' : ''}`;
+
+            if (reportesGuardados.length === 0) {
+                lista.innerHTML = '<div class="empty-state">No hay inspecciones guardadas aún. Complete el formulario y presione "Guardar en Historial".</div>';
+                return;
+            }
+
+            lista.innerHTML = '';
+            reportesGuardados.forEach((rep, idx) => {
+                const card = document.createElement('div');
+                card.className = 'reporte-card';
+                const fechaStr = rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : 'Sin fecha';
+                const resultadoText = rep.resultado === 'COMPLETO' ? '✅ COMPLETO' : '⚠️ REPOSICIÓN';
+                const resultadoColor = rep.resultado === 'COMPLETO' ? '#27ae60' : '#f39c12';
+                card.innerHTML = `
+                    <div class="reporte-info">
+                        <h4>🚑 Botiquín ${rep.tipoBotiquin || '—'} — ${rep.ubicacion || 'Sin ubicación'}</h4>
+                        <p>📅 ${fechaStr} | 👤 ${rep.responsable} | <span style="color:${resultadoColor};font-weight:700;">${resultadoText}</span> | ✓ ${rep.totalOk} ✗ ${rep.totalBad}</p>
+                    </div>
+                    <div class="reporte-actions">
+                        <button class="btn-small btn-view" onclick="verReporte(${idx})">👁️ Ver</button>
+                        <button class="btn-small btn-wa-small" onclick="enviarWhatsAppHistorial(${idx})">💬 WA</button>
+                        <button class="btn-small btn-del" onclick="eliminarReporte(${idx})">🗑️ Borrar</button>
+                    </div>
+                `;
+                lista.appendChild(card);
+            });
+        }
+
+        // Ver reporte en modal
+        function verReporte(idx) {
+            const rep = reportesGuardados[idx];
+            reporteActualEnModal = rep;
+            const modalBody = document.getElementById('modal-body');
+
+            let contHtml = '';
+            rep.contenedor.forEach(it => {
+                const valText = it.valor === 'bueno' ? '<span style="color:#27ae60;font-weight:700;">✓ Cumple</span>' :
+                               it.valor === 'malo' ? '<span style="color:#e74c3c;font-weight:700;">✗ No Cumple</span>' :
+                               it.valor === 'na' ? '<span style="color:#95a5a6;font-weight:700;">N/A</span>' :
+                               '<span style="color:#999;">—</span>';
+                contHtml += `<tr>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;">${it.item}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;text-align:center;">${valText}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;font-size:12px;color:#666;">${it.observaciones || '-'}</td>
+                </tr>`;
+            });
+
+            let contenHtml = '';
+            rep.contenido.forEach(it => {
+                const valText = it.valor === 'bueno' ? '<span style="color:#27ae60;font-weight:700;">✓ Bueno</span>' :
+                               it.valor === 'malo' ? '<span style="color:#e74c3c;font-weight:700;">✗ Malo</span>' :
+                               it.valor === 'na' ? '<span style="color:#95a5a6;font-weight:700;">N/A</span>' :
+                               '<span style="color:#999;">—</span>';
+                contenHtml += `<tr>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;">${it.item}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;text-align:center;">${it.cantidad || '-'}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;text-align:center;">${it.vencimiento ? new Date(it.vencimiento).toLocaleDateString('es-ES') : '-'}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;text-align:center;">${valText}</td>
+                </tr>`;
+            });
+
+            let instHtml = '';
+            rep.instrumental.forEach(it => {
+                const valText = it.valor === 'bueno' ? '<span style="color:#27ae60;font-weight:700;">✓ Bueno</span>' :
+                               it.valor === 'malo' ? '<span style="color:#e74c3c;font-weight:700;">✗ Malo</span>' :
+                               it.valor === 'na' ? '<span style="color:#95a5a6;font-weight:700;">N/A</span>' :
+                               '<span style="color:#999;">—</span>';
+                instHtml += `<tr>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;">${it.item}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;text-align:center;">${it.cantidad || '-'}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;text-align:center;">${valText}</td>
+                    <td style="padding:8px;border-bottom:1px solid #e0e0e0;font-size:12px;color:#666;">${it.observaciones || '-'}</td>
+                </tr>`;
+            });
+
+            const resultadoText = rep.resultado === 'COMPLETO' ? '✅ COMPLETO Y VIGENTE' : `⚠️ REQUIERE REPOSICIÓN (Plazo hasta: ${rep.plazoReposicion ? new Date(rep.plazoReposicion).toLocaleDateString('es-ES') : 'Sin definir'})`;
+
+            modalBody.innerHTML = `
+                <div style="margin-bottom:15px;line-height:1.8;">
+                    <p><strong>Ubicación:</strong> ${rep.ubicacion || '—'}</p>
+                    <p><strong>Tipo:</strong> ${rep.tipoBotiquin || '—'}</p>
+                    <p><strong>Responsable:</strong> ${rep.responsable || '—'}</p>
+                    <p><strong>Fecha:</strong> ${rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : '—'}</p>
+                    <p><strong>Resultado:</strong> ${resultadoText}</p>
+                </div>
+                <h4 style="color:#c0392b;margin:15px 0 10px;">📦 Estado del Contenedor</h4>
+                <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:15px;">
+                    <thead><tr style="background:#e74c3c;color:white;"><th style="padding:8px;text-align:left;">Ítem</th><th style="padding:8px;text-align:center;width:120px;">Estado</th><th style="padding:8px;text-align:left;">Obs.</th></tr></thead>
+                    <tbody>${contHtml}</tbody>
+                </table>
+                <h4 style="color:#c0392b;margin:15px 0 10px;">💊 Contenido</h4>
+                <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:15px;">
+                    <thead><tr style="background:#e74c3c;color:white;"><th style="padding:8px;text-align:left;">Elemento</th><th style="padding:8px;text-align:center;width:80px;">Cant.</th><th style="padding:8px;text-align:center;width:100px;">Vence</th><th style="padding:8px;text-align:center;width:100px;">Estado</th></tr></thead>
+                    <tbody>${contenHtml}</tbody>
+                </table>
+                <h4 style="color:#c0392b;margin:15px 0 10px;">🔧 Instrumental</h4>
+                <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:15px;">
+                    <thead><tr style="background:#e74c3c;color:white;"><th style="padding:8px;text-align:left;">Elemento</th><th style="padding:8px;text-align:center;width:80px;">Cant.</th><th style="padding:8px;text-align:center;width:100px;">Estado</th><th style="padding:8px;text-align:left;">Obs.</th></tr></thead>
+                    <tbody>${instHtml}</tbody>
+                </table>
+                ${rep.observacionesHallazgos ? `<div style="background:#f8f9fa;padding:12px;border-radius:6px;margin-bottom:10px;"><strong>Observaciones:</strong> ${rep.observacionesHallazgos}</div>` : ''}
+                ${rep.accionesCorrectivas ? `<div style="background:#fff3cd;padding:12px;border-radius:6px;margin-bottom:10px;"><strong>Acciones Correctivas:</strong> ${rep.accionesCorrectivas}</div>` : ''}
+            `;
+            document.getElementById('modal-ver').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-ver').classList.remove('active');
+            reporteActualEnModal = null;
+        }
+
+        function descargarDesdeModal() {
+            if (!reporteActualEnModal) return;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `
+                <div style="padding:20px;font-family:Arial,sans-serif;">
+                    <h2 style="color:#c0392b;text-align:center;margin-bottom:20px;">Inspección de Botiquín de Emergencia</h2>
+                    ${document.getElementById('modal-body').innerHTML}
+                </div>
+            `;
+            document.body.appendChild(tempDiv);
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Inspeccion_Botiquin_${reporteActualEnModal.fecha || 'sinfecha'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(tempDiv).save().then(() => {
+                document.body.removeChild(tempDiv);
+            });
+        }
+
+        // Eliminar reporte
+        function eliminarReporte(idx) {
+            if (confirm('¿Está seguro de eliminar esta inspección del historial?')) {
+                reportesGuardados.splice(idx, 1);
+                renderHistorial();
+            }
+        }
+
+        // Enviar WhatsApp desde historial
+        function enviarWhatsAppHistorial(idx) {
+            const rep = reportesGuardados[idx];
+            const fechaStr = rep.fecha ? new Date(rep.fecha).toLocaleDateString('es-ES') : 'Sin fecha';
+            const resultadoEmoji = rep.resultado === 'COMPLETO' ? '✅' : '⚠️';
+
+            const mensaje = `*INSPECCIÓN BOTIQUÍN DE EMERGENCIA*\n\n` +
+                `📍 Ubicación: ${rep.ubicacion || 'Sin ubicación'}\n` +
+                `🏥 Tipo: ${rep.tipoBotiquin || '—'}\n` +
+                `📅 Fecha: ${fechaStr}\n` +
+                `👤 Responsable: ${rep.responsable || 'Sin responsable'}\n\n` +
+                `✓ Cumple: ${rep.totalOk} | ✗ No Cumple: ${rep.totalBad}\n\n` +
+                `${resultadoEmoji} Resultado: ${rep.resultado === 'COMPLETO' ? 'COMPLETO Y VIGENTE' : 'REQUIERE REPOSICIÓN'}\n\n` +
+                `Inspección guardada en historial local.`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        // Generar PDF del formulario actual
+        function generarPDF() {
+            const ubicacion = document.getElementById('ubicacion').value || 'sin_ubicacion';
+            const fecha = document.getElementById('fecha').value || new Date().toISOString().split('T')[0];
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `Inspeccion_Botiquin_${ubicacion}_${fecha}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            document.body.classList.add('pdf-mode');
+            html2pdf().set(opt).from(document.getElementById('form-content')).save().then(() => {
+                document.body.classList.remove('pdf-mode');
+            }).catch(() => {
+                document.body.classList.remove('pdf-mode');
+            });
+        }
+
+        // Enviar WhatsApp del formulario actual
+        function enviarWhatsApp() {
+            const ubicacion = document.getElementById('ubicacion').value || 'Sin ubicación';
+            const tipo = document.getElementById('tipo-botiquin').value || 'Sin tipo';
+            const fecha = document.getElementById('fecha').value || new Date().toLocaleDateString();
+            const responsable = document.getElementById('responsable').value || 'Sin responsable';
+            const resultado = document.querySelector('input[name="resultado"]:checked')?.value || '';
+
+            let ok = 0, bad = 0;
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => {
+                if (r.value === 'bueno') ok++;
+                else if (r.value === 'malo') bad++;
+            });
+
+            const resultadoEmoji = resultado === 'COMPLETO' ? '✅' : resultado === 'REPOSICION' ? '⚠️' : '⬜';
+            const resultadoText = resultado === 'COMPLETO' ? 'COMPLETO Y VIGENTE' :
+                                 resultado === 'REPOSICION' ? 'REQUIERE REPOSICIÓN' : 'Sin resultado definido';
+
+            const mensaje = `*INSPECCIÓN BOTIQUÍN DE EMERGENCIA*\n\n` +
+                `📍 Ubicación: ${ubicacion}\n` +
+                `🏥 Tipo: ${tipo}\n` +
+                `📅 Fecha: ${fecha}\n` +
+                `👤 Responsable: ${responsable}\n\n` +
+                `✓ Cumple: ${ok} | ✗ No Cumple: ${bad}\n\n` +
+                `${resultadoEmoji} Resultado: ${resultadoText}\n\n` +
+                `El reporte PDF ha sido generado y guardado localmente.`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+            if(confirm('¿Está seguro de limpiar todo el formulario?')) {
+                document.querySelectorAll('input[type="text"], input[type="date"], input[type="number"]').forEach(el => el.value = '');
+                document.querySelectorAll('input[type="radio"]:checked').forEach(el => el.checked = false);
+                document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+                document.querySelectorAll('textarea').forEach(el => el.value = '');
+                document.getElementById('fecha').valueAsDate = new Date();
+                actualizarResumen();
+            }
+        }
+
+        // Inicializar
+        renderContenedor();
+        renderContenido();
+        renderInstrumental();
+        document.getElementById('fecha').valueAsDate = new Date();
+        renderHistorial();
+    </script>
+</body>
+</html>
